@@ -1,0 +1,653 @@
+{
+  "settings": {
+    "churchName": "First Baptist Church Jobele",
+    "tagline": "Sanctuary of Divine Power",
+    "affiliation": "Nigerian Baptist Convention",
+    "address": "P. O. Box 184, Jobele, Oyo State, Nigeria",
+    "phone": "+234 803 000 1234",
+    "email": "contact@fbcjobele.org",
+    "officeHours": "Tuesday – Friday: 9:00 AM – 4:00 PM",
+    "worshipTimes": [
+      {
+        "title": "Sunday School",
+        "day": "Sunday",
+        "time": "8:30 AM – 9:30 AM",
+        "description": "In-depth exposition and systematic study of the Word of God for all ages."
+      },
+      {
+        "title": "Celebration of Worship",
+        "day": "Sunday",
+        "time": "9:30 AM – 12:00 PM",
+        "description": "Praise, biblical preaching, reverent worship, and divine encounter in His presence."
+      },
+      {
+        "title": "Midweek Bible Study & Prayer",
+        "day": "Wednesday",
+        "time": "5:30 PM – 7:00 PM",
+        "description": "Interactive spiritual discipleship, corporate prayer, and practical Christian living."
+      },
+      {
+        "title": "Night of Divine Power Vigil",
+        "day": "Last Friday of the Month",
+        "time": "10:00 PM – 4:00 AM",
+        "description": "All-night spiritual warfare, prophetic intercession, deliverance, and divine impartation."
+      }
+    ],
+    "scriptureHighlight": {
+      "verse": "Your word is a lamp to my feet and a light to my path.",
+      "reference": "Psalm 119:105",
+      "theme": "Standing Firm on God's Unshakable Word"
+    },
+    "giving": {
+      "bankName": "First Bank of Nigeria",
+      "accountName": "First Baptist Church Jobele",
+      "accountNumber": "3012345678",
+      "sortCode": "011-152",
+      "onlineGivingUrl": "https://paystack.com/pay/fbcjobele",
+      "notes": "Please specify your giving purpose (Tithe, General Offering, Missions, Sanctuary Project) in your payment narrative or contact the Church Secretary."
+    },
+    "socialLinks": {
+      "facebook": "https://facebook.com/fbcjobele",
+      "youtube": "https://youtube.com/@fbcjobele",
+      "whatsapp": "https://wa.me/2348030001234",
+      "instagram": "https://instagram.com/fbcjobele",
+      "twitter": "https://twitter.com/fbcjobele"
+    }
+  },
+  "categories": [
+    {
+      "id": "cat-worship",
+      "name": "Worship & Services",
+      "slug": "worship",
+      "description": "Sunday celebration and devotional gatherings"
+    },
+    {
+      "id": "cat-conferences",
+      "name": "Conferences & Revivals",
+      "slug": "conferences",
+      "description": "Annual conventions, spiritual revivals and retreats"
+    },
+    {
+      "id": "cat-outreach",
+      "name": "Community Outreach",
+      "slug": "outreach",
+      "description": "Evangelism, medical missions, and charity in Jobele and environs"
+    },
+    {
+      "id": "cat-youth",
+      "name": "Youth & Young Adults",
+      "slug": "youth",
+      "description": "Youth fellowship, campus outreach, and creative arts"
+    },
+    {
+      "id": "cat-choir",
+      "name": "Choir & Music Ministry",
+      "slug": "choir",
+      "description": "Choral ministrations, orchestral praise, and hymnody"
+    },
+    {
+      "id": "cat-children",
+      "name": "Children & Sunday School",
+      "slug": "children",
+      "description": "Kingdom Kids, Bible club, and nurturing the next generation"
+    },
+    {
+      "id": "cat-special",
+      "name": "Milestones & Dedications",
+      "slug": "special",
+      "description": "Baby dedications, weddings, ordinations, and building milestones"
+    }
+  ],
+  "gallery": [
+    {
+      "title": "Dedication of Sanctuary Improvements",
+      "caption": "Celebrating the dedication of new pews and sound equipment at FBC Jobele.",
+      "category": "Milestones & Dedications",
+      "imageUrl": "/uploads/gallery/dedication_service_test_1789940682374.jpg",
+      "date": "2026-09-20",
+      "photographer": "Church Media Unit",
+      "isFeatured": true,
+      "order": 0,
+      "id": "img-1789940682406-wwz7z",
+      "createdAt": "2026-09-20T21:44:42.406Z"
+    },
+    {
+      "title": "Dedication of Sanctuary Improvements",
+      "caption": "Celebrating the dedication of new pews and sound equipment at FBC Jobele.",
+      "category": "Milestones & Dedications",
+      "imageUrl": "/uploads/gallery/fbc_gallery_1789936682306_0_dedication_service_test.jpg",
+      "date": "2026-09-20",
+      "photographer": "Church Media Unit",
+      "isFeatured": true,
+      "order": 0,
+      "id": "img-1789936682315-a2d4v",
+      "createdAt": "2026-09-20T20:38:02.315Z"
+    },
+    {
+      "id": "img-building",
+      "title": "Sanctuary of Divine Power - Church Facade",
+      "caption": "The physical meeting place and sanctuary of First Baptist Church Jobele, Oyo State.",
+      "category": "Worship & Services",
+      "imageUrl": "/images/brand/building.jpg",
+      "date": "2026-08-15",
+      "photographer": "Church Media Unit",
+      "isFeatured": true,
+      "order": 1,
+      "createdAt": "2026-08-15T09:00:00Z"
+    },
+    {
+      "id": "img-worship-1",
+      "title": "Congregational Praise & Adoration",
+      "caption": "Lifting holy hands in reverence during the Sunday morning celebration of worship.",
+      "category": "Worship & Services",
+      "imageUrl": "https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-09-06",
+      "photographer": "FBC Media Unit",
+      "isFeatured": true,
+      "order": 2,
+      "createdAt": "2026-09-06T10:30:00Z"
+    },
+    {
+      "id": "img-choir-1",
+      "title": "The Sanctuary Choir in Full Ministration",
+      "caption": "Leading the church family into triumphant praise through Baptist hymns and anointed chorals.",
+      "category": "Choir & Music Ministry",
+      "imageUrl": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-08-30",
+      "photographer": "FBC Media Unit",
+      "isFeatured": true,
+      "order": 3,
+      "createdAt": "2026-08-30T11:15:00Z"
+    },
+    {
+      "id": "img-outreach-1",
+      "title": "Jobele Community Medical & Food Mission",
+      "caption": "Sharing the tangible love of Christ through free medical checks and food distribution in Jobele.",
+      "category": "Community Outreach",
+      "imageUrl": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-08-22",
+      "photographer": "Missions Committee",
+      "isFeatured": true,
+      "order": 4,
+      "createdAt": "2026-08-22T14:00:00Z"
+    },
+    {
+      "id": "img-youth-1",
+      "title": "Youth Ignite Fellowship & Prayer",
+      "caption": "Young believers passionately seeking the Lord and building brotherly fellowship.",
+      "category": "Youth & Young Adults",
+      "imageUrl": "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-09-05",
+      "photographer": "Youth Fellowship",
+      "isFeatured": true,
+      "order": 5,
+      "createdAt": "2026-09-05T17:00:00Z"
+    },
+    {
+      "id": "img-children-1",
+      "title": "Kingdom Kids Sunday School Ministry",
+      "caption": "Instilling godly principles and biblical truths in our precious little ones.",
+      "category": "Children & Sunday School",
+      "imageUrl": "https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-09-13",
+      "photographer": "Sunday School Board",
+      "isFeatured": true,
+      "order": 6,
+      "createdAt": "2026-09-13T09:15:00Z"
+    },
+    {
+      "id": "img-prayer-1",
+      "title": "Night of Divine Power Prayer Vigil",
+      "caption": "Wrestling in the secret place: an intensive night of intercession and breakthrough.",
+      "category": "Conferences & Revivals",
+      "imageUrl": "https://images.unsplash.com/photo-1544427920-c49ccfb85579?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-08-28",
+      "photographer": "FBC Media Unit",
+      "isFeatured": false,
+      "order": 7,
+      "createdAt": "2026-08-28T23:30:00Z"
+    },
+    {
+      "id": "img-special-1",
+      "title": "Celebration of Church Anniversary & Dedication",
+      "caption": "Reflecting on decades of God's miraculous faithfulness in Jobele, Oyo State.",
+      "category": "Milestones & Dedications",
+      "imageUrl": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-07-20",
+      "photographer": "Anniversary Committee",
+      "isFeatured": false,
+      "order": 8,
+      "createdAt": "2026-07-20T12:00:00Z"
+    }
+  ],
+  "sermons": [
+    {
+      "id": "sermon-1",
+      "title": "Walking in the Reality of Divine Power",
+      "speaker": "Reverend Dr. [Pastor Name]",
+      "date": "2026-09-13",
+      "scripture": "Ephesians 1:18-20 & Acts 1:8",
+      "series": "Sanctuary of Power Series",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?auto=format&fit=crop&w=1000&q=80",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+      "description": "Discover how the surpassing greatness of God's power toward us who believe empowers our everyday walk, family life, and witness in the community.",
+      "transcript": "Beloved congregation of First Baptist Church Jobele, Paul prays that the eyes of our understanding may be enlightened to know the exceeding greatness of His power...",
+      "isFeatured": true,
+      "duration": "48 mins"
+    },
+    {
+      "id": "sermon-2",
+      "title": "Anchored in Christ: Standing Firm in Uncertain Times",
+      "speaker": "Pastor [Associate Pastor Name]",
+      "date": "2026-09-06",
+      "scripture": "Hebrews 6:17-20",
+      "series": "Unshakable Hope",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1000&q=80",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+      "description": "When the storms of life surge, we have a sure and steadfast anchor for the soul that enters into the inner place behind the curtain.",
+      "transcript": "Hope is not wishful thinking; hope is a divine certainty grounded in the character and oath of Almighty God...",
+      "isFeatured": false,
+      "duration": "42 mins"
+    },
+    {
+      "id": "sermon-3",
+      "title": "The Joy of Generous Biblical Stewardship",
+      "speaker": "Deacon [Leader Name]",
+      "date": "2026-08-30",
+      "scripture": "2 Corinthians 9:6-11",
+      "series": "Kingdom Stewardship",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&w=1000&q=80",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+      "description": "Understanding God's heart for giving, stewardship of time and resources, and trusting the Provider of every seed.",
+      "transcript": "God loves a cheerful giver because generosity reflects the very essence of Calvary...",
+      "isFeatured": false,
+      "duration": "37 mins"
+    },
+    {
+      "id": "sermon-4",
+      "title": "Building an Altar of Family Worship",
+      "speaker": "Reverend Dr. [Pastor Name]",
+      "date": "2026-08-23",
+      "scripture": "Joshua 24:14-15",
+      "series": "Godly Families",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1476820865390-c52aeebb9891?auto=format&fit=crop&w=1000&q=80",
+      "videoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+      "audioUrl": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+      "description": "Reclaiming the home as the foundational sanctuary for prayer, instruction in righteousness, and generational blessing.",
+      "transcript": "As for me and my house, we will serve the Lord! In an era of distraction, the family altar is our greatest shield...",
+      "isFeatured": false,
+      "duration": "51 mins"
+    }
+  ],
+  "events": [
+    {
+      "id": "event-featured",
+      "title": "Annual Divine Power Convention & Revival 2026",
+      "coverImage": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80",
+      "date": "2026-10-23",
+      "startTime": "05:00 PM",
+      "endTime": "08:30 PM",
+      "location": "Main Sanctuary, First Baptist Church, Jobele, Oyo State",
+      "description": "A three-day spirit-filled gathering of believers featuring guest ministers from the Nigerian Baptist Convention, fervent prayer, prophetic ministry, and supernatural encounters under the power of God.",
+      "organizer": "Revival & Planning Committee",
+      "registrationLink": "https://fbcjobele.org/events/annual-revival",
+      "contact": "+234 803 000 1234",
+      "isFeatured": true,
+      "category": "Conferences & Revivals",
+      "isPublished": true
+    },
+    {
+      "id": "event-2",
+      "title": "Jobele City-Wide Medical Outreach & Love Feast",
+      "coverImage": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80",
+      "date": "2026-10-10",
+      "startTime": "09:00 AM",
+      "endTime": "03:00 PM",
+      "location": "FBC Jobele Grounds & Community Health Center",
+      "description": "Free medical screenings, blood pressure checks, eye exams, free medications, and distribution of food staples for elderly and vulnerable residents of Jobele.",
+      "organizer": "Missions & Evangelism Ministry",
+      "registrationLink": "",
+      "contact": "missions@fbcjobele.org",
+      "isFeatured": false,
+      "category": "Outreach",
+      "isPublished": true
+    },
+    {
+      "id": "event-3",
+      "title": "Youth Summit: Rooted, Grounded & Unshakable",
+      "coverImage": "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=1000&q=80",
+      "date": "2026-10-17",
+      "startTime": "10:00 AM",
+      "endTime": "02:00 PM",
+      "location": "Youth Chapel & Fellowship Hall",
+      "description": "Empowering young Christians in academic excellence, career navigation, godly relationships, and authentic discipleship in a changing culture.",
+      "organizer": "Youth Fellowship Board",
+      "registrationLink": "",
+      "contact": "youth@fbcjobele.org",
+      "isFeatured": false,
+      "category": "Youth",
+      "isPublished": true
+    },
+    {
+      "id": "event-4",
+      "title": "All-Night Divine Power Deliverance & Praise Vigil",
+      "coverImage": "https://images.unsplash.com/photo-1544427920-c49ccfb85579?auto=format&fit=crop&w=1000&q=80",
+      "date": "2026-09-25",
+      "startTime": "10:00 PM",
+      "endTime": "04:30 AM",
+      "location": "Main Sanctuary, FBC Jobele",
+      "description": "Join us for our monthly covenant night of fervent intercession, praises, breaking generational bondages, and receiving divine acceleration.",
+      "organizer": "Pastoral Intercessory Unit",
+      "registrationLink": "",
+      "contact": "prayer@fbcjobele.org",
+      "isFeatured": false,
+      "category": "Worship",
+      "isPublished": true
+    }
+  ],
+  "news": [
+    {
+      "id": "news-1",
+      "title": "Preparation Begins for the Annual 2026 Divine Power Convention",
+      "slug": "preparation-begins-annual-convention",
+      "featuredImage": "https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1000&q=80",
+      "date": "2026-09-15",
+      "author": "Church Secretary",
+      "category": "Announcements",
+      "excerpt": "The Church Council announces key dates, guest ministers, and prayer guidelines for our upcoming annual convention.",
+      "content": "We give all glory to Almighty God as we approach our landmark Annual Divine Power Convention at First Baptist Church Jobele.\n\nUnder the theme **\"The Exceeding Greatness of His Power\"**, this year's convention promises to be a life-transforming season of spiritual realignment, physical healing, and communal rejuvenation.\n\n### Key Details:\n- **Dates**: October 23rd – 25th, 2026\n- **Venue**: Main Sanctuary, P. O. Box 184, Jobele, Oyo State\n- **Ministers**: Senior Pastoral Team and invited guest ministers from across the Nigerian Baptist Convention.\n\nAll members and ministries are encouraged to join the 21-day prayer countdown starting next Monday. Let us come with expectant hearts!",
+      "isPublished": true
+    },
+    {
+      "id": "news-2",
+      "title": "Highlights from the September Jobele Community Welfare Outreach",
+      "slug": "september-community-outreach-report",
+      "featuredImage": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=1000&q=80",
+      "date": "2026-09-08",
+      "author": "Missions Committee",
+      "category": "Outreach & Missions",
+      "excerpt": "Over 150 families in Jobele received relief supplies, medical consultations, and prayer as our outreach team took the Gospel to the streets.",
+      "content": "In obedience to the Great Commission and the commandment of love, First Baptist Church Jobele successfully carried out our monthly village and neighborhood outreach.\n\nOur volunteer medical doctors and nurses ministered to seniors and nursing mothers, while the welfare team distributed bags of rice, grains, and toiletries. Over 30 individuals made first-time commitments to Christ.\n\nThank you to everyone who contributed through their prayers and designated missions giving!",
+      "isPublished": true
+    },
+    {
+      "id": "news-3",
+      "title": "Baptist Doctrine & Discipleship Class: New Cohort Enrolling",
+      "slug": "new-discipleship-cohort-enrolling",
+      "featuredImage": "https://images.unsplash.com/photo-1507692049790-de58290a4334?auto=format&fit=crop&w=1000&q=80",
+      "date": "2026-09-01",
+      "author": "Christian Education Board",
+      "category": "Discipleship",
+      "excerpt": "New believers and those seeking believer's baptism or formal church membership are invited to enroll in our 6-week foundational class.",
+      "content": "Are you a new believer, newly relocated to Jobele, or desiring to deepen your understanding of Baptist heritage, biblical orthodoxy, and believer's baptism?\n\nRegistration is now open for the Autumn Discipleship Cohort. Classes will take place every Sunday morning before the main service.\n\nTopics covered include:\n- The Authority and Sufficiency of the Scriptures\n- The Trinitarian God and the Work of the Cross\n- Believer's Baptism by Immersion & The Lord's Supper\n- Stewardship and The Local Church Mission",
+      "isPublished": true
+    }
+  ],
+  "ministries": [
+    {
+      "id": "min-choir",
+      "name": "Sanctuary Choir & Music Ministry",
+      "slug": "choir",
+      "coverImage": "https://images.unsplash.com/photo-1465847899084-d164df4dedc6?auto=format&fit=crop&w=800&q=80",
+      "description": "Leading the church family in majestic choral praise, spiritual hymns, and contemporary worship that ushers in the presence of God.",
+      "purpose": "To glorify God through musical excellence, spiritual devotion, and anointed choral ministrations.",
+      "meetingTime": "Saturdays, 5:00 PM – 7:00 PM",
+      "leader": "Music Director [Leader Name]",
+      "contact": "choir@fbcjobele.org",
+      "category": "Worship & Arts",
+      "order": 1
+    },
+    {
+      "id": "min-youth",
+      "name": "Youth & Young Adults Fellowship",
+      "slug": "youth",
+      "coverImage": "https://images.unsplash.com/photo-1529070538774-1843cb3265df?auto=format&fit=crop&w=800&q=80",
+      "description": "A vibrant, passionate community of teenagers, campus students, and young professionals discovering their God-given destiny.",
+      "purpose": "To raise a generation of young believers who are unashamed of the Gospel and leaders in society.",
+      "meetingTime": "Saturdays, 4:00 PM – 6:00 PM",
+      "leader": "Youth Pastor / President [Leader Name]",
+      "contact": "youth@fbcjobele.org",
+      "category": "Generations",
+      "order": 2
+    },
+    {
+      "id": "min-women",
+      "name": "Women's Missionary Union (WMU)",
+      "slug": "women",
+      "coverImage": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80",
+      "description": "Equipping women of all ages for prayer, family leadership, benevolent outreach, and active global missions.",
+      "purpose": "To cultivate godly mothers, daughters, and sisters whose lives mirror the Proverbs 31 virtue.",
+      "meetingTime": "1st & 3rd Sundays after Service",
+      "leader": "WMU President [Leader Name]",
+      "contact": "wmu@fbcjobele.org",
+      "category": "Fellowships",
+      "order": 3
+    },
+    {
+      "id": "min-men",
+      "name": "Men's Missionary Union (MMU)",
+      "slug": "men",
+      "coverImage": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80",
+      "description": "Uniting fathers, husbands, and men of the church to stand as spiritual pillars in their homes and community.",
+      "purpose": "To build men of integrity, prayer, biblical responsibility, and kingdom stewardship.",
+      "meetingTime": "2nd Sunday of the Month, 4:00 PM",
+      "leader": "MMU President [Leader Name]",
+      "contact": "mmu@fbcjobele.org",
+      "category": "Fellowships",
+      "order": 4
+    },
+    {
+      "id": "min-children",
+      "name": "Kingdom Kids & Sunday School",
+      "slug": "children",
+      "coverImage": "https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?auto=format&fit=crop&w=800&q=80",
+      "description": "A safe, fun, and gospel-centered environment where infants and children learn the Word of God through creative lessons.",
+      "purpose": "To ground children in Bible memory, godly character, and the unconditional love of Jesus.",
+      "meetingTime": "Every Sunday during Worship Service",
+      "leader": "Children Coordinator [Leader Name]",
+      "contact": "kids@fbcjobele.org",
+      "category": "Generations",
+      "order": 5
+    },
+    {
+      "id": "min-evangelism",
+      "name": "Evangelism & Community Missions",
+      "slug": "evangelism",
+      "coverImage": "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?auto=format&fit=crop&w=800&q=80",
+      "description": "Reaching the unreached in Jobele, surrounding towns in Oyo State, and supporting Baptist mission outposts across Nigeria.",
+      "purpose": "To take the liberating Gospel of Jesus Christ beyond the church walls into streets, markets, and homes.",
+      "meetingTime": "2nd & 4th Saturdays, 8:00 AM",
+      "leader": "Missions Leader [Leader Name]",
+      "contact": "missions@fbcjobele.org",
+      "category": "Outreach & Missions",
+      "order": 6
+    },
+    {
+      "id": "min-prayer",
+      "name": "Intercessory Prayer Band",
+      "slug": "prayer",
+      "coverImage": "https://images.unsplash.com/photo-1544427920-c49ccfb85579?auto=format&fit=crop&w=800&q=80",
+      "description": "Standing in the gap for the church, our pastors, members' families, the town of Jobele, and our nation Nigeria.",
+      "purpose": "To cultivate a 24/7 spiritual watchtower where divine power is continuously invited through prayer.",
+      "meetingTime": "Tuesdays & Thursdays, 5:00 PM",
+      "leader": "Prayer Coordinator [Leader Name]",
+      "contact": "prayer@fbcjobele.org",
+      "category": "Spiritual Life",
+      "order": 7
+    }
+  ],
+  "leadership": [
+    {
+      "id": "lead-senior-pastor",
+      "name": "Reverend Dr. [Pastor Name]",
+      "role": "Senior Pastor & Spiritual Overseer",
+      "category": "Pastoral",
+      "bio": "Called by God to shepherd the flock of First Baptist Church Jobele, Reverend [Pastor Name] has faithfully ministered the Gospel of Christ with apostolic conviction, pastoral warmth, and deep passion for discipleship and revival under the Nigerian Baptist Convention.",
+      "image": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80",
+      "phone": "+234 [Church Phone]",
+      "email": "pastor@fbcjobele.org",
+      "order": 1,
+      "isSeniorLeader": true
+    },
+    {
+      "id": "lead-associate-pastor",
+      "name": "Pastor [Associate Name]",
+      "role": "Associate Minister (Education & Youth)",
+      "category": "Pastoral",
+      "bio": "Serving with dedication to develop youth discipleship, Sunday School curriculum, and campus outreaches throughout the Jobele community.",
+      "image": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=800&q=80",
+      "phone": "+234 [Church Phone]",
+      "email": "education@fbcjobele.org",
+      "order": 2,
+      "isSeniorLeader": false
+    },
+    {
+      "id": "lead-deacon-chair",
+      "name": "Deacon [Leader Name]",
+      "role": "Chairman, Board of Deacons",
+      "category": "Deacons",
+      "bio": "Providing godly oversight, spiritual counsel, and practical support to church families and sanctuary affairs.",
+      "image": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80",
+      "phone": "+234 [Church Phone]",
+      "email": "deacons@fbcjobele.org",
+      "order": 3,
+      "isSeniorLeader": false
+    },
+    {
+      "id": "lead-church-secretary",
+      "name": "Mrs. [Leader Name]",
+      "role": "Church Administrator & Secretary",
+      "category": "Heads",
+      "bio": "Managing daily administrative coordination, visitor services, and communications for First Baptist Church Jobele.",
+      "image": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=800&q=80",
+      "phone": "+234 [Church Phone]",
+      "email": "admin@fbcjobele.org",
+      "order": 4,
+      "isSeniorLeader": false
+    }
+  ],
+  "prayerRequests": [
+    {
+      "name": "Sister Folake Balogun",
+      "email": "folake@example.com",
+      "phone": "+234 803 111 2222",
+      "request": "Praying for safe journey mercies and divine wisdom in exams.",
+      "isAnonymous": false,
+      "preferredContact": "phone",
+      "category": "Spiritual Growth",
+      "id": "prayer-1789940680087",
+      "status": "unread",
+      "pastoralNotes": "",
+      "createdAt": "2026-09-20T21:44:40.087Z"
+    },
+    {
+      "name": "Sister Folake Balogun",
+      "email": "folake@example.com",
+      "phone": "+234 803 111 2222",
+      "request": "Praying for safe journey mercies and divine wisdom in exams.",
+      "isAnonymous": false,
+      "preferredContact": "phone",
+      "category": "Spiritual Growth",
+      "id": "prayer-1789936681243",
+      "status": "unread",
+      "pastoralNotes": "",
+      "createdAt": "2026-09-20T20:38:01.243Z"
+    },
+    {
+      "id": "prayer-seed-1",
+      "name": "Anonymous Sister",
+      "email": "",
+      "phone": "",
+      "request": "Please intercede for complete restoration of health for my mother and divine peace in our family.",
+      "isAnonymous": true,
+      "preferredContact": "none",
+      "category": "Healing",
+      "status": "prayed",
+      "pastoralNotes": "Lifted up during Wednesday morning pastoral prayer session.",
+      "createdAt": "2026-09-10T08:30:00Z"
+    }
+  ],
+  "contactMessages": [
+    {
+      "name": "Brother Kehinde",
+      "email": "kehinde@example.com",
+      "phone": "+234 802 333 4444",
+      "subject": "Inquiring about Wedding Service",
+      "message": "We are planning our church wedding ceremony at FBC Jobele and wish to speak with the pastor.",
+      "id": "contact-1789940680164",
+      "status": "new",
+      "createdAt": "2026-09-20T21:44:40.164Z"
+    },
+    {
+      "name": "Peter Oyedemi",
+      "email": "oyedemipeter5@gmail.com",
+      "phone": "",
+      "subject": "Pastoral Counseling",
+      "message": "I need prayer on my business",
+      "id": "contact-1789937500541",
+      "status": "new",
+      "createdAt": "2026-09-20T20:51:40.541Z"
+    },
+    {
+      "name": "Brother Kehinde",
+      "email": "kehinde@example.com",
+      "phone": "+234 802 333 4444",
+      "subject": "Inquiring about Wedding Service",
+      "message": "We are planning our church wedding ceremony at FBC Jobele and wish to speak with the pastor.",
+      "id": "contact-1789936681336",
+      "status": "new",
+      "createdAt": "2026-09-20T20:38:01.336Z"
+    },
+    {
+      "id": "contact-seed-1",
+      "name": "Brother Tunde Adeyemi",
+      "email": "tunde.adeyemi@example.com",
+      "phone": "+234 802 111 2233",
+      "subject": "Inquiring about Believer's Baptism Class",
+      "message": "Good day Pastor, I recently moved to Jobele and would love to join the upcoming believer's baptism class. When is the next orientation?",
+      "status": "read",
+      "createdAt": "2026-09-12T14:15:00Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "user-superadmin",
+      "username": "admin",
+      "email": "admin@fbcjobele.org",
+      "passwordHash": "$2a$10$k88JhEb0.tAzZXDGzPuLsOoqIXmvk.jYVuuEz8mFo09YrdQorQZse",
+      "name": "FBC Super Administrator",
+      "role": "superadmin",
+      "createdAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-content",
+      "username": "media_admin",
+      "email": "media@fbcjobele.org",
+      "passwordHash": "$2a$10$RhkIBwEzPefO/7cWpjtCZ.xPraFYSed9WkksnRluKYhIv9SJDVxmm",
+      "name": "Media & Content Director",
+      "role": "content_admin",
+      "createdAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "id": "user-pastor",
+      "username": "pastoral_desk",
+      "email": "pastor@fbcjobele.org",
+      "passwordHash": "$2a$10$VjeJqeqfFvEkTtovNdhTc.Lwn4GTOs2ghXHY5i1qBfnWpVK3mQ.nK",
+      "name": "Pastoral Care & Prayer Desk",
+      "role": "staff",
+      "createdAt": "2026-01-01T00:00:00Z"
+    },
+    {
+      "name": "Bro. Oluwaseun Davies",
+      "email": "staff_1789940686396@fbcjobele.org",
+      "username": "seun_1789940686397",
+      "passwordHash": "$2a$10$zl81GdifSxlx2IAF0U11tOQVTgrX6I.EDq4Gwee1UqnMIUD3gqve.",
+      "role": "content_admin",
+      "id": "user-1789940687726",
+      "createdAt": "2026-09-20T21:44:47.726Z"
+    }
+  ]
+}
