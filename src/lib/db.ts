@@ -39,87 +39,116 @@ interface DatabaseSchema {
   users: User[];
 }
 
-const DB_DIR = path.join(process.cwd(), "src", "data");
-const DB_PATH = path.join(DB_DIR, "db.json");
+import os from "os";
+
+// Global in-memory cache to preserve data across warm serverless requests
+declare global {
+  var __fbc_db_memory: DatabaseSchema | undefined;
+}
+
+const PRIMARY_DB_DIR = path.join(process.cwd(), "src", "data");
+const PRIMARY_DB_PATH = path.join(PRIMARY_DB_DIR, "db.json");
+const TMP_DB_DIR = path.join(os.tmpdir(), "fbc-jobele");
+const TMP_DB_PATH = path.join(TMP_DB_DIR, "db.json");
+
+function getInitialDatabase(): DatabaseSchema {
+  return {
+    settings: initialSiteSettings,
+    categories: initialCategories,
+    gallery: initialGalleryImages,
+    sermons: initialSermons,
+    events: initialEvents,
+    news: initialNews,
+    ministries: initialMinistries,
+    leadership: initialLeadership,
+    prayerRequests: [
+      {
+        id: "prayer-seed-1",
+        name: "Anonymous Sister",
+        email: "",
+        phone: "",
+        request: "Please intercede for complete restoration of health for my mother and divine peace in our family.",
+        isAnonymous: true,
+        preferredContact: "none",
+        category: "Healing",
+        status: "prayed",
+        pastoralNotes: "Lifted up during Wednesday morning pastoral prayer session.",
+        createdAt: "2026-09-10T08:30:00Z",
+      },
+    ],
+    contactMessages: [
+      {
+        id: "contact-seed-1",
+        name: "Brother Tunde Adeyemi",
+        email: "tunde.adeyemi@example.com",
+        phone: "+234 802 111 2233",
+        subject: "Inquiring about Believer's Baptism Class",
+        message: "Good day Pastor, I recently moved to Jobele and would love to join the upcoming believer's baptism class. When is the next orientation?",
+        status: "read",
+        createdAt: "2026-09-12T14:15:00Z",
+      },
+    ],
+    users: initialUsers,
+  };
+}
 
 function ensureDbExists(): DatabaseSchema {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
+  if (globalThis.__fbc_db_memory) {
+    return globalThis.__fbc_db_memory;
   }
 
-  if (!fs.existsSync(DB_PATH)) {
-    const initialData: DatabaseSchema = {
-      settings: initialSiteSettings,
-      categories: initialCategories,
-      gallery: initialGalleryImages,
-      sermons: initialSermons,
-      events: initialEvents,
-      news: initialNews,
-      ministries: initialMinistries,
-      leadership: initialLeadership,
-      prayerRequests: [
-        {
-          id: "prayer-seed-1",
-          name: "Anonymous Sister",
-          email: "",
-          phone: "",
-          request: "Please intercede for complete restoration of health for my mother and divine peace in our family.",
-          isAnonymous: true,
-          preferredContact: "none",
-          category: "Healing",
-          status: "prayed",
-          pastoralNotes: "Lifted up during Wednesday morning pastoral prayer session.",
-          createdAt: "2026-09-10T08:30:00Z",
-        },
-      ],
-      contactMessages: [
-        {
-          id: "contact-seed-1",
-          name: "Brother Tunde Adeyemi",
-          email: "tunde.adeyemi@example.com",
-          phone: "+234 802 111 2233",
-          subject: "Inquiring about Believer's Baptism Class",
-          message: "Good day Pastor, I recently moved to Jobele and would love to join the upcoming believer's baptism class. When is the next orientation?",
-          status: "read",
-          createdAt: "2026-09-12T14:15:00Z",
-        },
-      ],
-      users: initialUsers,
-    };
-    saveDb(initialData);
-    return initialData;
+  // Check candidate locations on disk
+  const candidates = [PRIMARY_DB_PATH, TMP_DB_PATH];
+  for (const candidate of candidates) {
+    try {
+      if (fs.existsSync(candidate)) {
+        const raw = fs.readFileSync(candidate, "utf-8");
+        const parsed = JSON.parse(raw) as DatabaseSchema;
+        if (parsed && parsed.settings && parsed.users) {
+          globalThis.__fbc_db_memory = parsed;
+          return parsed;
+        }
+      }
+    } catch {
+      // Continue to next candidate
+    }
   }
 
-  try {
-    const raw = fs.readFileSync(DB_PATH, "utf-8");
-    return JSON.parse(raw) as DatabaseSchema;
-  } catch (err) {
-    console.error("Error reading database file, re-initializing:", err);
-    const fallback: DatabaseSchema = {
-      settings: initialSiteSettings,
-      categories: initialCategories,
-      gallery: initialGalleryImages,
-      sermons: initialSermons,
-      events: initialEvents,
-      news: initialNews,
-      ministries: initialMinistries,
-      leadership: initialLeadership,
-      prayerRequests: [],
-      contactMessages: [],
-      users: initialUsers,
-    };
-    saveDb(fallback);
-    return fallback;
-  }
+  // Fallback to fresh seed data
+  const initial = getInitialDatabase();
+  globalThis.__fbc_db_memory = initial;
+  saveDb(initial);
+  return initial;
 }
 
 function saveDb(data: DatabaseSchema) {
-  if (!fs.existsSync(DB_DIR)) {
-    fs.mkdirSync(DB_DIR, { recursive: true });
+  // Always update in-memory state so subsequent requests see it instantly
+  globalThis.__fbc_db_memory = data;
+
+  // 1. Try saving to project directory (works in local development)
+  try {
+    if (!fs.existsSync(PRIMARY_DB_DIR)) {
+      fs.mkdirSync(PRIMARY_DB_DIR, { recursive: true });
+    }
+    const tempPath = `${PRIMARY_DB_PATH}.tmp`;
+    fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), "utf-8");
+    fs.renameSync(tempPath, PRIMARY_DB_PATH);
+    return;
+  } catch {
+    // Expected on Vercel / serverless read-only filesystem
   }
-  const tempPath = `${DB_PATH}.tmp`;
-  fs.writeFileSync(tempPath, JSON.stringify(data, null, 2), "utf-8");
-  fs.renameSync(tempPath, DB_PATH);
+
+  // 2. Fallback to /tmp directory (always writable on Vercel & AWS Lambda)
+  try {
+    if (!fs.existsSync(TMP_DB_DIR)) {
+      fs.mkdirSync(TMP_DB_DIR, { recursive: true });
+    }
+    const tempTmpPath = `${TMP_DB_PATH}.tmp`;
+    fs.writeFileSync(tempTmpPath, JSON.stringify(data, null, 2), "utf-8");
+    fs.renameSync(tempTmpPath, TMP_DB_PATH);
+  } catch (err) {
+    console.warn("Could not write to disk, maintaining in-memory database:", err);
+  }
 }
 
 // ==================== SETTINGS ====================

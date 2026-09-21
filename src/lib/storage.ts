@@ -71,25 +71,36 @@ export async function uploadMedia(
   }
 
   // 2. Fallback to local storage (for local development)
-  const uploadsDir = path.join(process.cwd(), "public", "uploads", folder);
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+  try {
+    const uploadsDir = path.join(process.cwd(), "public", "uploads", folder);
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
+    const ext = path.extname(originalFilename) || ".jpg";
+    const cleanBase = path
+      .basename(originalFilename, ext)
+      .replace(/[^a-zA-Z0-9_-]/g, "_");
+    const uniqueName = `${cleanBase}_${Date.now()}${ext}`;
+    const filePath = path.join(uploadsDir, uniqueName);
+
+    fs.writeFileSync(filePath, buffer);
+
+    const localUrl = `/uploads/${folder}/${uniqueName}`;
+    return {
+      url: localUrl,
+      publicId: uniqueName,
+    };
+  } catch (diskErr) {
+    // On read-only serverless environments without Cloudinary keys, fallback to base64 Data URI
+    const ext = path.extname(originalFilename).toLowerCase();
+    const mime = ext === ".png" ? "image/png" : ext === ".webp" ? "image/webp" : "image/jpeg";
+    const dataUri = `data:${mime};base64,${buffer.toString("base64")}`;
+    return {
+      url: dataUri,
+      publicId: `data_${Date.now()}`,
+    };
   }
-
-  const ext = path.extname(originalFilename) || ".jpg";
-  const cleanBase = path
-    .basename(originalFilename, ext)
-    .replace(/[^a-zA-Z0-9_-]/g, "_");
-  const uniqueName = `${cleanBase}_${Date.now()}${ext}`;
-  const filePath = path.join(uploadsDir, uniqueName);
-
-  fs.writeFileSync(filePath, buffer);
-
-  const localUrl = `/uploads/${folder}/${uniqueName}`;
-  return {
-    url: localUrl,
-    publicId: uniqueName,
-  };
 }
 
 /**
