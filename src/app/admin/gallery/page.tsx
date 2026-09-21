@@ -31,6 +31,7 @@ export default function GalleryAdminPage() {
   const [uploadCaption, setUploadCaption] = useState("");
   const [uploadPhotographer, setUploadPhotographer] = useState("Church Media Unit");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState("");
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
 
@@ -102,7 +103,63 @@ export default function GalleryAdminPage() {
     }
   };
 
-  // Submit batch upload
+  // Fast client-side image compression: shrinks heavy 8-15MB phone camera photos to ~250KB in milliseconds
+  const compressImageForWeb = async (file: File): Promise<File> => {
+    if (!file.type.startsWith("image/") || file.size < 400 * 1024) {
+      return file;
+    }
+
+    return new Promise((resolve) => {
+      const img = new window.Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        const canvas = document.createElement("canvas");
+        let { width, height } = img;
+
+        // Scale to maximum 1920px (full HD is optimal for web)
+        const maxDim = 1920;
+        if (width > height && width > maxDim) {
+          height = Math.round((height * maxDim) / width);
+          width = maxDim;
+        } else if (height > maxDim) {
+          width = Math.round((width * maxDim) / height);
+          height = maxDim;
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return resolve(file);
+
+        ctx.drawImage(img, 0, 0, width, height);
+
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) return resolve(file);
+            const cleanBase = file.name.replace(/\.[^/.]+$/, "");
+            const compressed = new File([blob], `${cleanBase}.jpg`, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            resolve(compressed);
+          },
+          "image/jpeg",
+          0.82
+        );
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(file);
+      };
+
+      img.src = objectUrl;
+    });
+  };
+
+  // Submit batch upload with compression and progressive per-photo uploading
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedFiles.length === 0) {
@@ -115,38 +172,58 @@ export default function GalleryAdminPage() {
     setUploadMessage("");
 
     try {
-      const formData = new FormData();
-      selectedFiles.forEach((file) => {
-        formData.append("files", file);
-      });
-      formData.append("category", uploadCategory);
-      formData.append("title", uploadTitle);
-      formData.append("caption", uploadCaption);
-      formData.append("photographer", uploadPhotographer);
+      let successCount = 0;
 
-      const res = await fetch("/api/admin/gallery/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        setUploadMessage(
-          `Success! ${data.images?.length || selectedFiles.length} photo(s) have been uploaded and are now visible on the public website.`
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
+        setUploadProgress(
+          `Optimizing & uploading ${i + 1} of ${selectedFiles.length} (${file.name})...`
         );
-        clearSelectedFiles();
-        setUploadTitle("");
-        setUploadCaption("");
-        fetchImages();
-        setActiveTab("manage");
-      } else {
-        const errData = await res.json();
-        setUploadError(errData.error || "Upload failed.");
+
+        // 1. Shrink heavy mobile camera photo
+        const optimizedFile = await compressImageForWeb(file);
+
+        // 2. Upload individually so it never exceeds Vercel's 4.5MB request limit
+        const formData = new FormData();
+        formData.append("file", optimizedFile);
+        formData.append("category", uploadCategory);
+        formData.append(
+          "title",
+          uploadTitle || file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ")
+        );
+        formData.append("caption", uploadCaption);
+        formData.append("photographer", uploadPhotographer);
+
+        const res = await fetch("/api/admin/gallery/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!res.ok) {
+          const errData = await res.json().catch(() => ({}));
+          throw new Error(errData.error || `Upload failed for ${file.name}`);
+        }
+
+        successCount++;
       }
-    } catch {
-      setUploadError("Network error occurred during upload.");
+
+      setUploadMessage(
+        `Success! ${successCount} photo(s) have been optimized, uploaded, and are now live on the church website.`
+      );
+      clearSelectedFiles();
+      setUploadTitle("");
+      setUploadCaption("");
+      fetchImages();
+      setActiveTab("manage");
+    } catch (err: any) {
+      console.error("Upload error:", err);
+      setUploadError(
+        err.message ||
+          "Network error occurred during upload. Please check your internet connection."
+      );
     } finally {
       setIsUploading(false);
+      setUploadProgress("");
     }
   };
 
@@ -426,7 +503,7 @@ export default function GalleryAdminPage() {
                 {isUploading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-gold-300" />
-                    <span>Uploading to Sanctuary Gallery...</span>
+                    <span>{uploadProgress || "Uploading to Sanctuary Gallery..."}</span>
                   </>
                 ) : (
                   <>

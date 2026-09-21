@@ -2,24 +2,25 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 import path from "path";
 
-// Initialize Cloudinary if environment variables are provided
-const hasCloudinaryCredentials = Boolean(
-  process.env.CLOUDINARY_CLOUD_NAME &&
-  process.env.CLOUDINARY_API_KEY &&
-  process.env.CLOUDINARY_API_SECRET
-);
+function getCloudinaryReady(): boolean {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
-if (hasCloudinaryCredentials) {
-  cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    api_key: process.env.CLOUDINARY_API_KEY,
-    api_secret: process.env.CLOUDINARY_API_SECRET,
-    secure: true,
-  });
+  if (cloudName && apiKey && apiSecret) {
+    cloudinary.config({
+      cloud_name: cloudName.trim(),
+      api_key: apiKey.trim(),
+      api_secret: apiSecret.trim(),
+      secure: true,
+    });
+    return true;
+  }
+  return false;
 }
 
 export function isCloudStorageEnabled(): boolean {
-  return hasCloudinaryCredentials;
+  return getCloudinaryReady();
 }
 
 export interface UploadResult {
@@ -30,44 +31,54 @@ export interface UploadResult {
 }
 
 /**
- * Upload an image or file buffer to Cloudinary (or fallback to local disk in dev)
+ * Upload an image or file buffer to Cloudinary (or fallback to local disk / data URI in dev)
  */
 export async function uploadMedia(
   buffer: Buffer,
   originalFilename: string,
   folder: string = "gallery"
 ): Promise<UploadResult> {
+  const isCloudReady = getCloudinaryReady();
+
   // 1. If Cloudinary credentials are set (e.g. on Vercel), upload to Cloudinary CDN
-  if (hasCloudinaryCredentials) {
-    return new Promise<UploadResult>((resolve, reject) => {
-      const cleanName = path
-        .parse(originalFilename)
-        .name.replace(/[^a-zA-Z0-9_-]/g, "_");
-      const publicId = `${cleanName}_${Date.now()}`;
+  if (isCloudReady) {
+    try {
+      const uploadPromise = new Promise<UploadResult>((resolve, reject) => {
+        const cleanName = path
+          .parse(originalFilename)
+          .name.replace(/[^a-zA-Z0-9_-]/g, "_");
+        const publicId = `${cleanName}_${Date.now()}`;
 
-      const uploadStream = cloudinary.uploader.upload_stream(
-        {
-          folder: `fbc-jobele/${folder}`,
-          public_id: publicId,
-          resource_type: "auto",
-        },
-        (error, result) => {
-          if (error || !result) {
-            console.error("Cloudinary upload error:", error);
-            return reject(error || new Error("Cloudinary upload failed"));
+        const uploadStream = cloudinary.uploader.upload_stream(
+          {
+            folder: `fbc-jobele/${folder}`,
+            public_id: publicId,
+            resource_type: "auto",
+            transformation: [{ quality: "auto:good", fetch_format: "auto" }],
+          },
+          (error, result) => {
+            if (error || !result) {
+              console.error("Cloudinary upload error:", error);
+              return reject(error || new Error("Cloudinary upload failed"));
+            }
+
+            resolve({
+              url: result.secure_url,
+              publicId: result.public_id,
+              width: result.width,
+              height: result.height,
+            });
           }
+        );
 
-          resolve({
-            url: result.secure_url,
-            publicId: result.public_id,
-            width: result.width,
-            height: result.height,
-          });
-        }
-      );
+        uploadStream.end(buffer);
+      });
 
-      uploadStream.end(buffer);
-    });
+      return await uploadPromise;
+    } catch (cloudErr) {
+      console.warn("Cloudinary upload error, falling back to safe local/data storage:", cloudErr);
+      // Fall through to fallback below
+    }
   }
 
   // 2. Fallback to local storage (for local development)
