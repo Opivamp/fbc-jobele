@@ -28,20 +28,21 @@ export default function Hero({ settings }: HeroProps) {
               <span className="text-xs font-bold tracking-wider text-burgundy-800 uppercase font-sans">
                 {settings.tagline || "Sanctuary of Divine Power"}
               </span>
-              <span className="text-burgundy-300">&bull;</span>
-              <span className="text-xs font-semibold text-navy-800">
-                Nigerian Baptist Convention
-              </span>
+              {settings.affiliation && (
+                <>
+                  <span className="text-burgundy-300">&bull;</span>
+                  <span className="text-xs font-semibold text-navy-800">
+                    {settings.affiliation}
+                  </span>
+                </>
+              )}
             </div>
 
             {/* Main Editorial Headline */}
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-serif font-black text-obsidian-950 tracking-tight leading-[1.08]">
               WELCOME TO{" "}
-              <span className="block text-burgundy-700">
-                FIRST BAPTIST
-              </span>
-              <span className="block text-navy-900 relative inline-block">
-                CHURCH JOBELE
+              <span className="block text-burgundy-700 uppercase relative inline-block">
+                {settings.churchName || "FIRST BAPTIST CHURCH JOBELE"}
                 <span className="absolute -bottom-1 left-0 w-full h-1.5 bg-gradient-to-r from-gold-500 via-gold-400 to-transparent rounded-full" />
               </span>
             </h1>
@@ -52,7 +53,7 @@ export default function Hero({ settings }: HeroProps) {
             </p>
 
             <p className="text-xs sm:text-sm md:text-base text-obsidian-600 max-w-xl font-normal leading-relaxed">
-              We are an established family of believers in Jobele, Oyo State, rooted in the sound doctrine of God&apos;s Word, vibrant worship, and heartfelt fellowship for all generations.
+              We are an established family of believers in {settings.address ? settings.address.replace(/^P\.\s*O\.\s*Box\s*\d+,?\s*/i, "") : "Jobele, Oyo State"}, rooted in the sound doctrine of God&apos;s Word, vibrant worship, and heartfelt fellowship for all generations.
             </p>
 
             {/* Action Buttons */}

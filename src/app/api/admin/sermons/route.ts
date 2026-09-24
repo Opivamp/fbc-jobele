@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getSermons, addSermon, updateSermon, deleteSermon } from "@/lib/db";
+import {
+  ensureDbLoadedAsync,
+  getSermonsAsync,
+  addSermonAsync,
+  updateSermonAsync,
+  deleteSermonAsync,
+} from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ sermons: getSermons() });
+  await ensureDbLoadedAsync();
+  const sermons = await getSermonsAsync();
+  return NextResponse.json({ sermons });
 }
 
 export async function POST(request: NextRequest) {
@@ -15,9 +23,11 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const body = await request.json();
-    const sermon = addSermon(body);
+    await ensureDbLoadedAsync();
+    const sermon = await addSermonAsync(body);
     return NextResponse.json({ success: true, sermon });
-  } catch {
+  } catch (err) {
+    console.error("Failed to create sermon:", err);
     return NextResponse.json({ error: "Failed to create sermon" }, { status: 500 });
   }
 }
@@ -28,9 +38,11 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, ...partial } = body;
-    const updated = updateSermon(id, partial);
+    await ensureDbLoadedAsync();
+    const updated = await updateSermonAsync(id, partial);
     return NextResponse.json({ success: true, sermon: updated });
-  } catch {
+  } catch (err) {
+    console.error("Failed to update sermon:", err);
     return NextResponse.json({ error: "Failed to update sermon" }, { status: 500 });
   }
 }
@@ -42,9 +54,11 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    const success = deleteSermon(id);
+    await ensureDbLoadedAsync();
+    const success = await deleteSermonAsync(id);
     return NextResponse.json({ success });
-  } catch {
+  } catch (err) {
+    console.error("Failed to delete sermon:", err);
     return NextResponse.json({ error: "Failed to delete sermon" }, { status: 500 });
   }
 }

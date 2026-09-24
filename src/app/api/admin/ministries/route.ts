@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getMinistries, addMinistry, updateMinistry, deleteMinistry } from "@/lib/db";
+import {
+  ensureDbLoadedAsync,
+  getMinistriesAsync,
+  addMinistryAsync,
+  updateMinistryAsync,
+  deleteMinistryAsync,
+} from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ ministries: getMinistries() });
+  await ensureDbLoadedAsync();
+  const ministries = await getMinistriesAsync();
+  return NextResponse.json({ ministries });
 }
 
 export async function POST(request: NextRequest) {
@@ -15,9 +23,11 @@ export async function POST(request: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   try {
     const body = await request.json();
-    const min = addMinistry(body);
+    await ensureDbLoadedAsync();
+    const min = await addMinistryAsync(body);
     return NextResponse.json({ success: true, ministry: min });
-  } catch {
+  } catch (err) {
+    console.error("Failed to create ministry:", err);
     return NextResponse.json({ error: "Failed to create ministry" }, { status: 500 });
   }
 }
@@ -28,9 +38,11 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, ...partial } = body;
-    const updated = updateMinistry(id, partial);
+    await ensureDbLoadedAsync();
+    const updated = await updateMinistryAsync(id, partial);
     return NextResponse.json({ success: true, ministry: updated });
-  } catch {
+  } catch (err) {
+    console.error("Failed to update ministry:", err);
     return NextResponse.json({ error: "Failed to update ministry" }, { status: 500 });
   }
 }
@@ -42,9 +54,11 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    const success = deleteMinistry(id);
+    await ensureDbLoadedAsync();
+    const success = await deleteMinistryAsync(id);
     return NextResponse.json({ success });
-  } catch {
+  } catch (err) {
+    console.error("Failed to delete ministry:", err);
     return NextResponse.json({ error: "Failed to delete ministry" }, { status: 500 });
   }
 }

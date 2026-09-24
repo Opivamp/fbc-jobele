@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { getLeadership } from "@/lib/db";
+import { ensureDbLoadedAsync, getLeadershipAsync } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const leadership = getLeadership();
+    await ensureDbLoadedAsync();
+    const leadership = await getLeadershipAsync();
     return NextResponse.json({ leadership });
   } catch (err) {
     console.error("Error fetching public leadership:", err);

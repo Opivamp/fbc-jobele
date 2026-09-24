@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getUserByEmailOrUsername } from "@/lib/db";
+import { ensureDbLoadedAsync, getUserByEmailOrUsernameAsync } from "@/lib/db";
 import { signToken, getAuthCookieName } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -14,7 +16,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const user = getUserByEmailOrUsername(identifier);
+    await ensureDbLoadedAsync();
+
+    const user = await getUserByEmailOrUsernameAsync(identifier);
     if (!user) {
       return NextResponse.json(
         { error: "Invalid credentials. Please verify your login details." },
@@ -58,9 +62,9 @@ export async function POST(request: NextRequest) {
 
     return response;
   } catch (err) {
-    console.error("Login error:", err);
+    console.error("Login route error:", err);
     return NextResponse.json(
-      { error: "Server error during authentication." },
+      { error: "Authentication server error. Please try again." },
       { status: 500 }
     );
   }

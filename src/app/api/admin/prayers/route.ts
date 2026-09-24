@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getPrayerRequests, updatePrayerRequest, deletePrayerRequest } from "@/lib/db";
+import {
+  ensureDbLoadedAsync,
+  getPrayerRequestsAsync,
+  updatePrayerRequestAsync,
+  deletePrayerRequestAsync,
+} from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ prayerRequests: getPrayerRequests() });
+  await ensureDbLoadedAsync();
+  const prayerRequests = await getPrayerRequestsAsync();
+  return NextResponse.json({ prayerRequests });
 }
 
 export async function PUT(request: NextRequest) {
@@ -16,9 +23,11 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, ...partial } = body;
-    const updated = updatePrayerRequest(id, partial);
+    await ensureDbLoadedAsync();
+    const updated = await updatePrayerRequestAsync(id, partial);
     return NextResponse.json({ success: true, prayerRequest: updated });
-  } catch {
+  } catch (err) {
+    console.error("Failed to update prayer request:", err);
     return NextResponse.json({ error: "Failed to update prayer request" }, { status: 500 });
   }
 }
@@ -30,9 +39,11 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    const success = deletePrayerRequest(id);
+    await ensureDbLoadedAsync();
+    const success = await deletePrayerRequestAsync(id);
     return NextResponse.json({ success });
-  } catch {
+  } catch (err) {
+    console.error("Failed to delete prayer request:", err);
     return NextResponse.json({ error: "Failed to delete prayer request" }, { status: 500 });
   }
 }

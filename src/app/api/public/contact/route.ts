@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addContactMessage } from "@/lib/db";
+import { ensureDbLoadedAsync, addContactMessageAsync } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +15,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const saved = addContactMessage({
+    await ensureDbLoadedAsync();
+
+    const saved = await addContactMessageAsync({
       name: name.trim(),
       email: email.trim(),
       phone: phone?.trim() || "",

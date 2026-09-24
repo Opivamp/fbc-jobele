@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSettings } from "@/lib/db";
+import { ensureDbLoadedAsync, getSettingsAsync } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const settings = getSettings();
+    await ensureDbLoadedAsync();
+    const settings = await getSettingsAsync();
     return NextResponse.json({ settings });
   } catch (err) {
     console.error("Error fetching public settings:", err);

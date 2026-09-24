@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addPrayerRequest } from "@/lib/db";
+import { ensureDbLoadedAsync, addPrayerRequestAsync } from "@/lib/db";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +15,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const saved = addPrayerRequest({
+    await ensureDbLoadedAsync();
+
+    const saved = await addPrayerRequestAsync({
       name: isAnonymous ? "Anonymous Believer" : name?.trim() || "Anonymous Believer",
       email: email?.trim() || "",
       phone: phone?.trim() || "",

@@ -34,7 +34,7 @@ export default function VisitorCtaSection({ settings }: VisitorCtaSectionProps) 
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-black tracking-tight leading-tight text-ivory-100">
-              You&apos;re Welcome at First Baptist Church Jobele
+              You&apos;re Welcome at {settings.churchName || "First Baptist Church Jobele"}
             </h2>
 
             <p className="text-base sm:text-lg text-ivory-200/90 leading-relaxed font-light">

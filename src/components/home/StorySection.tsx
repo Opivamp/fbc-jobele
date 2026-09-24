@@ -4,8 +4,17 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, BookOpen, Heart, Users } from "lucide-react";
+import { SiteSettings } from "@/lib/types";
 
-export default function StorySection() {
+interface StorySectionProps {
+  settings?: SiteSettings;
+}
+
+export default function StorySection({ settings }: StorySectionProps) {
+  const churchName = settings?.churchName || "First Baptist Church Jobele";
+  const tagline = settings?.tagline || "Sanctuary of Divine Power";
+  const affiliation = settings?.affiliation || "Nigerian Baptist Convention";
+
   return (
     <section className="py-20 md:py-28 bg-ivory-100 overflow-hidden">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -21,7 +30,7 @@ export default function StorySection() {
               <div className="relative h-[400px] sm:h-[480px] w-full rounded-xl overflow-hidden shadow-elevated border-2 border-ivory-300">
                 <Image
                   src="https://images.unsplash.com/photo-1519817650390-64a93db51149?auto=format&fit=crop&w=1200&q=80"
-                  alt="Worship Family at First Baptist Church Jobele"
+                  alt={`Worship Family at ${churchName}`}
                   fill
                   className="object-cover"
                 />
@@ -33,7 +42,7 @@ export default function StorySection() {
                     &ldquo;A spiritual sanctuary where strangers become family and faith becomes active through love.&rdquo;
                   </p>
                   <p className="text-xs font-semibold text-gold-700 uppercase tracking-wider mt-2">
-                    FBC Jobele &bull; Oyo State
+                    {churchName} &bull; Oyo State
                   </p>
                 </div>
               </div>
@@ -52,7 +61,7 @@ export default function StorySection() {
             </div>
 
             <p className="text-base text-obsidian-700 leading-relaxed">
-              At <strong className="text-burgundy-800 font-semibold">First Baptist Church Jobele</strong> (Sanctuary of Divine Power), we believe church is more than a weekly service—it is a spiritual home. Deeply anchored in our heritage under the <strong className="text-navy-900 font-semibold">Nigerian Baptist Convention</strong>, we gather together to seek the face of God, be transformed by the scriptures, and encourage one another across life&apos;s changing seasons.
+              At <strong className="text-burgundy-800 font-semibold">{churchName}</strong> ({tagline}), we believe church is more than a weekly service—it is a spiritual home. Deeply anchored in our heritage under the <strong className="text-navy-900 font-semibold">{affiliation}</strong>, we gather together to seek the face of God, be transformed by the scriptures, and encourage one another across life&apos;s changing seasons.
             </p>
 
             <p className="text-sm text-obsidian-600 leading-relaxed">
@@ -72,34 +81,33 @@ export default function StorySection() {
               </div>
 
               <div className="p-3.5 rounded-lg bg-ivory-200/70 border border-ivory-300">
-                <Heart className="w-5 h-5 text-crimson-600 mb-1.5" />
+                <Heart className="w-5 h-5 text-burgundy-700 mb-1.5" />
                 <h4 className="text-xs font-bold text-obsidian-900 uppercase tracking-wide">
-                  Genuine Fellowship
+                  Loving Fellowship
                 </h4>
                 <p className="text-[11px] text-obsidian-600 mt-0.5">
-                  Walking together through joy, grief, and triumph.
+                  A caring community where everyone belongs.
                 </p>
               </div>
 
               <div className="p-3.5 rounded-lg bg-ivory-200/70 border border-ivory-300">
-                <Users className="w-5 h-5 text-sanctuary-600 mb-1.5" />
+                <Users className="w-5 h-5 text-burgundy-700 mb-1.5" />
                 <h4 className="text-xs font-bold text-obsidian-900 uppercase tracking-wide">
-                  Community Mission
+                  Gospel Impact
                 </h4>
                 <p className="text-[11px] text-obsidian-600 mt-0.5">
-                  Loving our Jobele neighborhood through action.
+                  Reaching Jobele and supporting missions.
                 </p>
               </div>
             </div>
 
-            {/* CTA */}
             <div className="pt-2">
               <Link
                 href="/about"
-                className="inline-flex items-center text-sm font-bold text-burgundy-700 hover:text-burgundy-900 group"
+                className="inline-flex items-center text-sm font-semibold text-burgundy-700 hover:text-burgundy-900 group"
               >
-                <span>Discover Our Story</span>
-                <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1.5 transition-transform" />
+                <span>Read our full history & Baptist beliefs</span>
+                <ArrowRight className="w-4 h-4 ml-1.5 group-hover:translate-x-1 transition-transform" />
               </Link>
             </div>
           </div>

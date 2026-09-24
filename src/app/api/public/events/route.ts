@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { getEvents } from "@/lib/db";
+import { ensureDbLoadedAsync, getEventsAsync } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const events = getEvents("all");
+    await ensureDbLoadedAsync();
+    const events = await getEventsAsync("all");
     return NextResponse.json({ events });
   } catch (err) {
     console.error("Error fetching public events:", err);

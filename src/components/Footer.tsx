@@ -72,7 +72,7 @@ export default function Footer({ settings }: FooterProps) {
                   {tagline}
                 </p>
                 <p className="text-[11px] text-ivory-300/80">
-                  Nigerian Baptist Convention
+                  {settings?.affiliation || "Nigerian Baptist Convention"}
                 </p>
               </div>
             </div>
@@ -296,7 +296,7 @@ export default function Footer({ settings }: FooterProps) {
         {/* Bottom Bar with Copyright & Pastoral Portal */}
         <div className="mt-12 pt-6 border-t border-ivory-200/10 flex flex-col sm:flex-row justify-between items-center text-xs text-ivory-400 gap-4">
           <p>
-            &copy; {currentYear} First Baptist Church Jobele. All Rights Reserved. Affiliated with the Nigerian Baptist Convention.
+            &copy; {currentYear} {churchName}. All Rights Reserved. Affiliated with the {settings?.affiliation || "Nigerian Baptist Convention"}.
           </p>
           <div className="flex items-center space-x-4">
             <Link

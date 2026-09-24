@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
-import { getSettings } from "@/lib/db";
+import { getSettingsAsync, ensureDbLoadedAsync } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -59,26 +59,28 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const settings = getSettings();
+  await ensureDbLoadedAsync();
+  const settings = await getSettingsAsync();
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Church",
     name: settings.churchName || "First Baptist Church Jobele",
-    alternateName: ["FBC Jobele", "Sanctuary of Divine Power"],
-    description:
-      "Official Christian church affiliated with the Nigerian Baptist Convention, serving the community of Jobele and Oyo State.",
+    alternateName: [settings.churchName, settings.tagline].filter(Boolean),
+    description: `Official Christian church affiliated with the ${
+      settings.affiliation || "Nigerian Baptist Convention"
+    }, serving the community of Jobele and Oyo State.`,
     url: "https://fbcjobele.org",
     logo: "https://fbcjobele.org/images/brand/logo.jpg",
     image: "https://fbcjobele.org/images/brand/building.jpg",
     address: {
       "@type": "PostalAddress",
-      streetAddress: "P. O. Box 184",
+      streetAddress: settings.address || "P. O. Box 184",
       addressLocality: "Jobele",
       addressRegion: "Oyo State",
       addressCountry: "Nigeria",
@@ -110,7 +112,7 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-ivory-100 text-obsidian-900 antialiased selection:bg-burgundy-700 selection:text-white">
-        <Navigation worshipTimes={settings.worshipTimes} />
+        <Navigation settings={settings} worshipTimes={settings.worshipTimes} />
         <main className="flex-grow">{children}</main>
         <Footer settings={settings} />
       </body>

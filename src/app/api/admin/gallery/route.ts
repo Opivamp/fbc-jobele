@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import {
-  getGalleryImages,
+  ensureDbLoadedAsync,
+  syncCloudinaryGalleryImagesAsync,
+  getGalleryImagesAsync,
   getGalleryImageById,
-  addGalleryImage,
-  updateGalleryImage,
-  deleteGalleryImage,
+  addGalleryImageAsync,
+  updateGalleryImageAsync,
+  deleteGalleryImageAsync,
 } from "@/lib/db";
 import { deleteMedia } from "@/lib/storage";
 
@@ -16,7 +18,9 @@ export async function GET() {
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  const images = getGalleryImages();
+  await ensureDbLoadedAsync();
+  await syncCloudinaryGalleryImagesAsync();
+  const images = await getGalleryImagesAsync();
   return NextResponse.json({ images });
 }
 
@@ -27,9 +31,10 @@ export async function POST(request: NextRequest) {
   }
   try {
     const body = await request.json();
-    const image = addGalleryImage(body);
+    const image = await addGalleryImageAsync(body);
     return NextResponse.json({ success: true, image });
   } catch (err) {
+    console.error("Failed to create image record:", err);
     return NextResponse.json({ error: "Failed to create image record" }, { status: 500 });
   }
 }
@@ -42,12 +47,13 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, ...partial } = body;
-    const updated = updateGalleryImage(id, partial);
+    const updated = await updateGalleryImageAsync(id, partial);
     if (!updated) {
       return NextResponse.json({ error: "Image not found" }, { status: 404 });
     }
     return NextResponse.json({ success: true, image: updated });
   } catch (err) {
+    console.error("Failed to update image:", err);
     return NextResponse.json({ error: "Failed to update image" }, { status: 500 });
   }
 }
@@ -67,10 +73,10 @@ export async function DELETE(request: NextRequest) {
     if (existing && existing.imageUrl) {
       await deleteMedia(existing.imageUrl, "gallery");
     }
-    const deleted = deleteGalleryImage(id);
+    const deleted = await deleteGalleryImageAsync(id);
     return NextResponse.json({ success: deleted });
   } catch (err) {
+    console.error("Failed to delete image:", err);
     return NextResponse.json({ error: "Failed to delete image" }, { status: 500 });
   }
 }
-

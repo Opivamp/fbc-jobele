@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Mail, Phone, Sparkles, Shield, Heart } from "lucide-react";
-import { getLeadership } from "@/lib/db";
+import { ensureDbLoadedAsync, getLeadershipAsync, getSettingsAsync } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +12,10 @@ export const metadata = {
     "Meet the pastoral leadership, ministers, deacons, and administrators serving First Baptist Church Jobele in Oyo State.",
 };
 
-export default function LeadershipPage() {
-  const leaders = getLeadership();
+export default async function LeadershipPage() {
+  await ensureDbLoadedAsync();
+  const settings = await getSettingsAsync();
+  const leaders = await getLeadershipAsync();
   const seniorLeader = leaders.find((l) => l.isSeniorLeader) || leaders[0];
   const otherLeaders = leaders.filter((l) => l.id !== seniorLeader?.id);
 
@@ -32,7 +34,7 @@ export default function LeadershipPage() {
             Our Pastoral Leadership
           </h1>
           <p className="text-base sm:text-lg text-ivory-200 max-w-2xl mx-auto font-light leading-relaxed">
-            Godly men and women dedicated to prayer, pastoral care, spiritual mentorship, and the oversight of First Baptist Church Jobele.
+            Godly men and women dedicated to prayer, pastoral care, spiritual mentorship, and the oversight of {settings.churchName || "First Baptist Church Jobele"}.
           </p>
         </div>
       </section>

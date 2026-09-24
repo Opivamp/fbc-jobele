@@ -1,13 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
-import { getContactMessages, updateContactMessage, deleteContactMessage } from "@/lib/db";
+import {
+  ensureDbLoadedAsync,
+  getContactMessagesAsync,
+  updateContactMessageAsync,
+  deleteContactMessageAsync,
+} from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   const session = getSession();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  return NextResponse.json({ messages: getContactMessages() });
+  await ensureDbLoadedAsync();
+  const messages = await getContactMessagesAsync();
+  return NextResponse.json({ messages });
 }
 
 export async function PUT(request: NextRequest) {
@@ -16,9 +23,11 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     const { id, ...partial } = body;
-    const updated = updateContactMessage(id, partial);
+    await ensureDbLoadedAsync();
+    const updated = await updateContactMessageAsync(id, partial);
     return NextResponse.json({ success: true, message: updated });
-  } catch {
+  } catch (err) {
+    console.error("Failed to update message:", err);
     return NextResponse.json({ error: "Failed to update message" }, { status: 500 });
   }
 }
@@ -30,9 +39,11 @@ export async function DELETE(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const id = searchParams.get("id");
     if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    const success = deleteContactMessage(id);
+    await ensureDbLoadedAsync();
+    const success = await deleteContactMessageAsync(id);
     return NextResponse.json({ success });
-  } catch {
+  } catch (err) {
+    console.error("Failed to delete message:", err);
     return NextResponse.json({ error: "Failed to delete message" }, { status: 500 });
   }
 }

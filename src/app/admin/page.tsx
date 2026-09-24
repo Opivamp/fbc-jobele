@@ -18,15 +18,6 @@ import {
   Clock,
   ShieldCheck,
 } from "lucide-react";
-import {
-  getGalleryImages,
-  getSermons,
-  getAllEventsAdmin,
-  getNews,
-  getMinistries,
-  getPrayerRequests,
-  getContactMessages,
-} from "@/lib/db";
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState({

@@ -12,7 +12,7 @@ import {
   Cross,
   CheckCircle2,
 } from "lucide-react";
-import { getSettings, getLeadership } from "@/lib/db";
+import { ensureDbLoadedAsync, getSettingsAsync, getLeadershipAsync } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
@@ -22,9 +22,10 @@ export const metadata = {
     "Discover the history, mission, vision, and core Baptist beliefs of First Baptist Church Jobele (Sanctuary of Divine Power), affiliated with the Nigerian Baptist Convention.",
 };
 
-export default function AboutPage() {
-  const settings = getSettings();
-  const leadership = getLeadership();
+export default async function AboutPage() {
+  await ensureDbLoadedAsync();
+  const settings = await getSettingsAsync();
+  const leadership = await getLeadershipAsync();
   const seniorLeader = leadership.find((l) => l.isSeniorLeader) || leadership[0];
 
   const coreValues = [
@@ -137,11 +138,11 @@ export default function AboutPage() {
             </h2>
 
             <p className="text-base text-obsidian-700 leading-relaxed">
-              Founded as an outpost of biblical truth and Baptist witness, <strong className="text-burgundy-800">First Baptist Church Jobele</strong> has stood for decades as a spiritual lighthouse in Jobele, Oyo State. Affiliated with the historic <strong className="text-navy-900">Nigerian Baptist Convention</strong>, our sanctuary has been home to continuous generations of worshippers who gather to experience the transformative power of God.
+              Founded as an outpost of biblical truth and Baptist witness, <strong className="text-burgundy-800">{settings.churchName || "First Baptist Church Jobele"}</strong> has stood for decades as a spiritual lighthouse in {settings.address ? settings.address.replace(/^P\.\s*O\.\s*Box\s*\d+,?\s*/i, "") : "Jobele, Oyo State"}. Affiliated with the historic <strong className="text-navy-900">{settings.affiliation || "Nigerian Baptist Convention"}</strong>, our sanctuary has been home to continuous generations of worshippers who gather to experience the transformative power of God.
             </p>
 
             <p className="text-sm text-obsidian-600 leading-relaxed">
-              Known affectionately as the <strong className="text-obsidian-900">Sanctuary of Divine Power</strong>, our church has witnessed salvation, supernatural healings, restored families, and trained men and women who have gone forth to impact society with integrity and Christian virtue.
+              Known affectionately as the <strong className="text-obsidian-900">{settings.tagline || "Sanctuary of Divine Power"}</strong>, our church has witnessed salvation, supernatural healings, restored families, and trained men and women who have gone forth to impact society with integrity and Christian virtue.
             </p>
 
             <div className="p-4 rounded-xl bg-ivory-200 border-l-4 border-gold-500 text-obsidian-800 text-sm italic font-serif">
@@ -154,14 +155,14 @@ export default function AboutPage() {
             <div className="relative rounded-2xl overflow-hidden shadow-elevated border-4 border-white h-96">
               <Image
                 src="/images/brand/building.jpg"
-                alt="First Baptist Church Jobele Sanctuary"
+                alt={`${settings.churchName || "First Baptist Church Jobele"} Sanctuary`}
                 fill
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
               <div className="absolute bottom-4 left-4 right-4 text-white text-xs p-3 rounded-lg bg-black/60 backdrop-blur-sm border border-white/20">
-                <p className="font-semibold text-gold-300">Sanctuary of Divine Power</p>
-                <p className="text-[11px] text-ivory-200">P. O. Box 184, Jobele, Oyo State, Nigeria</p>
+                <p className="font-semibold text-gold-300">{settings.tagline || "Sanctuary of Divine Power"}</p>
+                <p className="text-[11px] text-ivory-200">{settings.address || "P. O. Box 184, Jobele, Oyo State, Nigeria"}</p>
               </div>
             </div>
           </div>
@@ -211,7 +212,7 @@ export default function AboutPage() {
             Our Core Values
           </h2>
           <p className="text-sm text-obsidian-600 mt-2">
-            The foundational biblical convictions that shape every ministry, service, and decision at FBC Jobele.
+            The foundational biblical convictions that shape every ministry, service, and decision at {settings.churchName || "FBC Jobele"}.
           </p>
         </div>
 

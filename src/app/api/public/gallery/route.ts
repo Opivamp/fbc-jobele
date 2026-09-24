@@ -1,12 +1,19 @@
 import { NextResponse } from "next/server";
-import { getGalleryImages, getGalleryCategories } from "@/lib/db";
+import {
+  ensureDbLoadedAsync,
+  syncCloudinaryGalleryImagesAsync,
+  getGalleryImagesAsync,
+  getGalleryCategoriesAsync,
+} from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const images = getGalleryImages();
-    const categories = getGalleryCategories();
+    await ensureDbLoadedAsync();
+    await syncCloudinaryGalleryImagesAsync();
+    const images = await getGalleryImagesAsync();
+    const categories = await getGalleryCategoriesAsync();
     return NextResponse.json({
       images,
       categories,

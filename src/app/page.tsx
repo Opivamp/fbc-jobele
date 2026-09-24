@@ -12,24 +12,27 @@ import TestimonialsSection from "@/components/home/TestimonialsSection";
 import LatestNewsSection from "@/components/home/LatestNewsSection";
 import VisitorCtaSection from "@/components/home/VisitorCtaSection";
 import {
-  getSettings,
-  getFeaturedEvent,
-  getMinistries,
-  getLatestSermon,
-  getFeaturedGalleryImages,
-  getNews,
+  ensureDbLoadedAsync,
+  getSettingsAsync,
+  getFeaturedEventAsync,
+  getMinistriesAsync,
+  getLatestSermonAsync,
+  getFeaturedGalleryImagesAsync,
+  getNewsAsync,
 } from "@/lib/db";
 
 // Dynamic rendering so newly uploaded photos and events reflect instantly without rebuilding
 export const dynamic = "force-dynamic";
 
-export default function HomePage() {
-  const settings = getSettings();
-  const featuredEvent = getFeaturedEvent();
-  const ministries = getMinistries();
-  const latestSermon = getLatestSermon();
-  const galleryImages = getFeaturedGalleryImages(6);
-  const news = getNews(true).slice(0, 3);
+export default async function HomePage() {
+  await ensureDbLoadedAsync();
+  const settings = await getSettingsAsync();
+  const featuredEvent = await getFeaturedEventAsync();
+  const ministries = await getMinistriesAsync();
+  const latestSermon = await getLatestSermonAsync();
+  const galleryImages = await getFeaturedGalleryImagesAsync(6);
+  const newsList = await getNewsAsync(true);
+  const news = newsList.slice(0, 3);
 
   return (
     <div className="flex flex-col">
@@ -40,7 +43,7 @@ export default function HomePage() {
       <WorshipStrip settings={settings} />
 
       {/* 3. A Church Family for Every Season */}
-      <StorySection />
+      <StorySection settings={settings} />
 
       {/* 4. This Week at FBC Jobele */}
       <WeeklyTimeline settings={settings} />
@@ -66,7 +69,7 @@ export default function HomePage() {
       {/* 11. News & Announcements */}
       <LatestNewsSection news={news} />
 
-      {/* 11. Plan Your Visit CTA */}
+      {/* 12. Plan Your Visit CTA */}
       <VisitorCtaSection settings={settings} />
     </div>
   );

@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
-import { getSermons } from "@/lib/db";
+import { ensureDbLoadedAsync, getSermonsAsync } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const sermons = getSermons();
+    await ensureDbLoadedAsync();
+    const sermons = await getSermonsAsync();
     return NextResponse.json({ sermons });
   } catch (err) {
     console.error("Error fetching public sermons:", err);

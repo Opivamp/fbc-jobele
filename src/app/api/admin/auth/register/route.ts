@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { getUserByEmailOrUsername, addUser } from "@/lib/db";
+import {
+  ensureDbLoadedAsync,
+  getUserByEmailOrUsernameAsync,
+  addUserAsync,
+} from "@/lib/db";
 import { signToken, getAuthCookieName } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
 
 const CHURCH_STAFF_PASSCODE =
   process.env.CHURCH_STAFF_PASSCODE || "FBC-JOBELE-COVENANT-2026";
@@ -40,9 +46,12 @@ export async function POST(request: NextRequest) {
     const cleanEmail = email.toLowerCase().trim();
     const cleanUsername = (username || email.split("@")[0]).toLowerCase().trim().replace(/[^a-z0-9_-]/g, "");
 
+    await ensureDbLoadedAsync();
+
     // 4. Check if user already exists
-    const existing = getUserByEmailOrUsername(cleanEmail) || getUserByEmailOrUsername(cleanUsername);
-    if (existing) {
+    const existingEmail = await getUserByEmailOrUsernameAsync(cleanEmail);
+    const existingUser = await getUserByEmailOrUsernameAsync(cleanUsername);
+    if (existingEmail || existingUser) {
       return NextResponse.json(
         { error: "An account with this email or username already exists. Please sign in instead." },
         { status: 409 }
@@ -55,8 +64,8 @@ export async function POST(request: NextRequest) {
     // 6. Hash password
     const passwordHash = bcrypt.hashSync(password, 10);
 
-    // 7. Add user to database
-    const newUser = addUser({
+    // 7. Add user to database with awaited cloud persistence
+    const newUser = await addUserAsync({
       name: name.trim(),
       email: cleanEmail,
       username: cleanUsername,
