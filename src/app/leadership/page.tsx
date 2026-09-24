@@ -4,6 +4,8 @@ import Link from "next/link";
 import { Mail, Phone, Sparkles, Shield, Heart } from "lucide-react";
 import { getLeadership } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "Pastoral Leadership & Deacons | First Baptist Church Jobele",
   description:

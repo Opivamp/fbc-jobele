@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Calendar, User, ArrowRight, Sparkles, Share2, Search } from "lucide-react";
@@ -8,9 +8,20 @@ import { initialNews } from "@/lib/seed-data";
 import { NewsPost } from "@/lib/types";
 
 export default function NewsPage() {
-  const [posts] = useState<NewsPost[]>(initialNews);
+  const [posts, setPosts] = useState<NewsPost[]>(initialNews);
   const [search, setSearch] = useState("");
   const [selectedCat, setSelectedCat] = useState("all");
+
+  useEffect(() => {
+    fetch("/api/public/news")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.news && Array.isArray(data.news)) {
+          setPosts(data.news);
+        }
+      })
+      .catch((err) => console.error("Could not fetch latest news:", err));
+  }, []);
 
   const categories = ["all", "Announcements", "Outreach & Missions", "Discipleship"];
 

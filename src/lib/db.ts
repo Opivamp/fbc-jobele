@@ -92,29 +92,117 @@ function getInitialDatabase(): DatabaseSchema {
   };
 }
 
+function syncDbToCloud(data: DatabaseSchema) {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+  if (!cloudName || !apiKey || !apiSecret) return;
+
+  try {
+    const { v2: cloudinary } = require("cloudinary");
+    cloudinary.config({
+      cloud_name: cloudName.trim(),
+      api_key: apiKey.trim(),
+      api_secret: apiSecret.trim(),
+      secure: true,
+    });
+
+    const buffer = Buffer.from(JSON.stringify(data), "utf-8");
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "raw",
+        public_id: "fbc-jobele/database/db.json",
+        overwrite: true,
+        invalidate: true,
+      },
+      (error: any) => {
+        if (error) {
+          console.warn("Cloudinary database backup failed:", error);
+        }
+      }
+    );
+    stream.end(buffer);
+  } catch (err) {
+    console.warn("Could not sync database to Cloudinary:", err);
+  }
+}
+
+function tryRestoreFromCloud(): boolean {
+  const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+  if (!cloudName) return false;
+
+  try {
+    const url = `https://res.cloudinary.com/${cloudName.trim()}/raw/upload/fbc-jobele/database/db.json`;
+    if (!fs.existsSync(TMP_DB_DIR)) {
+      fs.mkdirSync(TMP_DB_DIR, { recursive: true });
+    }
+
+    const { execSync } = require("child_process");
+    execSync(`curl -s -f -m 3 "${url}" -o "${TMP_DB_PATH}"`, { stdio: "ignore" });
+
+    if (fs.existsSync(TMP_DB_PATH)) {
+      const raw = fs.readFileSync(TMP_DB_PATH, "utf-8");
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.settings && parsed.users) {
+        return true;
+      }
+    }
+  } catch {
+    // Cloudinary backup not found or network timeout, safe to ignore
+  }
+  return false;
+}
+
 function ensureDbExists(): DatabaseSchema {
   if (globalThis.__fbc_db_memory) {
     return globalThis.__fbc_db_memory;
   }
 
-  // Check candidate locations on disk
-  const candidates = [PRIMARY_DB_PATH, TMP_DB_PATH];
-  for (const candidate of candidates) {
+  // 1. Check /tmp first (where live updates are saved on serverless)
+  if (fs.existsSync(TMP_DB_PATH)) {
     try {
-      if (fs.existsSync(candidate)) {
-        const raw = fs.readFileSync(candidate, "utf-8");
+      const raw = fs.readFileSync(TMP_DB_PATH, "utf-8");
+      const parsed = JSON.parse(raw) as DatabaseSchema;
+      if (parsed && parsed.settings && parsed.users) {
+        globalThis.__fbc_db_memory = parsed;
+        return parsed;
+      }
+    } catch {
+      // Continue to next source
+    }
+  }
+
+  // 2. On fresh/cold serverless containers, attempt restoring from Cloudinary persistent cloud backup
+  if (process.env.CLOUDINARY_CLOUD_NAME) {
+    if (tryRestoreFromCloud()) {
+      try {
+        const raw = fs.readFileSync(TMP_DB_PATH, "utf-8");
         const parsed = JSON.parse(raw) as DatabaseSchema;
         if (parsed && parsed.settings && parsed.users) {
           globalThis.__fbc_db_memory = parsed;
           return parsed;
         }
+      } catch {
+        // Continue
       }
-    } catch {
-      // Continue to next candidate
     }
   }
 
-  // Fallback to fresh seed data
+  // 3. Fallback to primary repository bundled file (works in local dev & initial seed)
+  if (fs.existsSync(PRIMARY_DB_PATH)) {
+    try {
+      const raw = fs.readFileSync(PRIMARY_DB_PATH, "utf-8");
+      const parsed = JSON.parse(raw) as DatabaseSchema;
+      if (parsed && parsed.settings && parsed.users) {
+        globalThis.__fbc_db_memory = parsed;
+        return parsed;
+      }
+    } catch {
+      // Continue
+    }
+  }
+
+  // 4. Fallback to fresh seed data
   const initial = getInitialDatabase();
   globalThis.__fbc_db_memory = initial;
   saveDb(initial);
@@ -149,6 +237,9 @@ function saveDb(data: DatabaseSchema) {
   } catch (err) {
     console.warn("Could not write to disk, maintaining in-memory database:", err);
   }
+
+  // 3. Asynchronously back up database to Cloudinary Raw Storage
+  syncDbToCloud(data);
 }
 
 // ==================== SETTINGS ====================

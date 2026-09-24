@@ -14,6 +14,8 @@ import {
 } from "lucide-react";
 import { getSettings, getLeadership } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 export const metadata = {
   title: "About Us | First Baptist Church Jobele",
   description:

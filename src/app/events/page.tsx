@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,7 +16,19 @@ import { Event } from "@/lib/types";
 
 export default function EventsPage() {
   const [tab, setTab] = useState<"upcoming" | "past">("upcoming");
-  const events = initialEvents;
+  const [events, setEvents] = useState<Event[]>(initialEvents);
+
+  useEffect(() => {
+    fetch("/api/public/events")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.events && Array.isArray(data.events)) {
+          setEvents(data.events);
+        }
+      })
+      .catch((err) => console.error("Could not fetch latest events:", err));
+  }, []);
+
   const now = new Date().toISOString().split("T")[0];
 
   const upcomingEvents = events.filter((e) => e.date >= now);

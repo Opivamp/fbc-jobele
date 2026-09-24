@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Heart,
@@ -16,7 +16,18 @@ import { initialSiteSettings } from "@/lib/seed-data";
 
 export default function GivePage() {
   const [copied, setCopied] = useState(false);
-  const giving = initialSiteSettings.giving;
+  const [giving, setGiving] = useState(initialSiteSettings.giving);
+
+  useEffect(() => {
+    fetch("/api/public/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.settings?.giving) {
+          setGiving(data.settings.giving);
+        }
+      })
+      .catch((err) => console.error("Could not fetch latest giving details:", err));
+  }, []);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(giving.accountNumber);

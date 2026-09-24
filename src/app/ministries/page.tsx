@@ -1,14 +1,26 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, Users, Mail, Sparkles, ArrowRight, Heart } from "lucide-react";
 import { initialMinistries } from "@/lib/seed-data";
+import { Ministry } from "@/lib/types";
 
 export default function MinistriesPage() {
   const [activeCategory, setActiveCategory] = useState("all");
-  const ministries = initialMinistries;
+  const [ministries, setMinistries] = useState<Ministry[]>(initialMinistries);
+
+  useEffect(() => {
+    fetch("/api/public/ministries")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.ministries && Array.isArray(data.ministries)) {
+          setMinistries(data.ministries);
+        }
+      })
+      .catch((err) => console.error("Could not fetch latest ministries:", err));
+  }, []);
 
   const categories = [
     { label: "All Ministries", value: "all" },

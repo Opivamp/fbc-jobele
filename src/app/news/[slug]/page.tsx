@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import { Calendar, User, ArrowLeft, Share2, Tag, ShieldCheck } from "lucide-react";
 import { getNewsBySlug, getNews } from "@/lib/db";
 
+export const dynamic = "force-dynamic";
+
 interface ArticlePageProps {
   params: { slug: string };
 }

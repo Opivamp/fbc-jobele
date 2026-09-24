@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import {
   Play,
@@ -18,11 +18,22 @@ import { initialSermons } from "@/lib/seed-data";
 import { Sermon } from "@/lib/types";
 
 export default function SermonsPage() {
-  const [sermons] = useState<Sermon[]>(initialSermons);
+  const [sermons, setSermons] = useState<Sermon[]>(initialSermons);
   const [search, setSearch] = useState("");
   const [selectedSeries, setSelectedSeries] = useState("all");
   const [activeVideoSermon, setActiveVideoSermon] = useState<Sermon | null>(null);
   const [activeNotesSermon, setActiveNotesSermon] = useState<Sermon | null>(null);
+
+  useEffect(() => {
+    fetch("/api/public/sermons")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.sermons && Array.isArray(data.sermons)) {
+          setSermons(data.sermons);
+        }
+      })
+      .catch((err) => console.error("Could not fetch latest sermons:", err));
+  }, []);
 
   // Extract unique series
   const seriesList = ["all", ...Array.from(new Set(sermons.map((s) => s.series)))];

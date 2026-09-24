@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,7 +16,7 @@ import {
   Send,
   HelpCircle,
 } from "lucide-react";
-import { getSettings } from "@/lib/db";
+import { SiteSettings } from "@/lib/types";
 
 export default function PlanYourVisitPage() {
   const [name, setName] = useState("");
@@ -27,6 +27,24 @@ export default function PlanYourVisitPage() {
   const [hasKids, setHasKids] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState<Partial<SiteSettings>>({
+    address: "P. O. Box 184, Jobele, Oyo State, Nigeria",
+    worshipTimes: [
+      { title: "Sunday School", day: "Sunday", time: "8:30 AM – 9:30 AM", description: "Bible study & discipleship" },
+      { title: "Celebration Service", day: "Sunday", time: "9:30 AM – 12:00 PM", description: "Praise, worship & Word" }
+    ]
+  });
+
+  useEffect(() => {
+    fetch("/api/public/settings")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.settings) {
+          setSettings(data.settings);
+        }
+      })
+      .catch((err) => console.error("Could not fetch visit settings:", err));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -121,22 +139,31 @@ export default function PlanYourVisitPage() {
                 Sunday Gathering Schedule
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs text-obsidian-700 pt-1">
-                <div className="p-3 rounded-xl bg-ivory-200/80">
-                  <span className="font-bold text-obsidian-900 block text-sm">
-                    8:30 AM &ndash; 9:30 AM
-                  </span>
-                  <p className="text-obsidian-600 mt-0.5">
-                    Sunday School & Bible Exposition
-                  </p>
-                </div>
-                <div className="p-3 rounded-xl bg-burgundy-50 border border-burgundy-200/60">
-                  <span className="font-bold text-burgundy-950 block text-sm">
-                    9:30 AM &ndash; 12:00 PM
-                  </span>
-                  <p className="text-burgundy-800 mt-0.5">
-                    Celebration Service & Preaching
-                  </p>
-                </div>
+                {(settings.worshipTimes || []).slice(0, 2).map((wt, idx) => (
+                  <div
+                    key={idx}
+                    className={`p-3 rounded-xl ${
+                      idx === 1
+                        ? "bg-burgundy-50 border border-burgundy-200/60"
+                        : "bg-ivory-200/80"
+                    }`}
+                  >
+                    <span
+                      className={`font-bold block text-sm ${
+                        idx === 1 ? "text-burgundy-950" : "text-obsidian-900"
+                      }`}
+                    >
+                      {wt.time}
+                    </span>
+                    <p
+                      className={`mt-0.5 ${
+                        idx === 1 ? "text-burgundy-800" : "text-obsidian-600"
+                      }`}
+                    >
+                      {wt.title} &ndash; {wt.day}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
 
@@ -149,7 +176,7 @@ export default function PlanYourVisitPage() {
                     Sanctuary Address & Directions
                   </h4>
                   <p className="text-xs sm:text-sm text-obsidian-600 mt-0.5">
-                    P. O. Box 184, Jobele, Oyo State, Nigeria. Conveniently located along the main town road of Jobele with prominent signage.
+                    {settings.address || "P. O. Box 184, Jobele, Oyo State, Nigeria."} Conveniently located along the main town road of Jobele with prominent signage.
                   </p>
                   <div className="pt-2">
                     <a
