@@ -122,7 +122,7 @@ export async function deleteMedia(
   folder: string = "gallery"
 ): Promise<boolean> {
   // If it's a Cloudinary asset
-  if (hasCloudinaryCredentials && (urlOrPublicId.includes("cloudinary.com") || !urlOrPublicId.startsWith("/"))) {
+  if (getCloudinaryReady() && (urlOrPublicId.includes("cloudinary.com") || !urlOrPublicId.startsWith("/"))) {
     try {
       // Extract public_id if full URL provided
       let publicId = urlOrPublicId;

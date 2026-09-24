@@ -32,6 +32,7 @@ export default function GalleryAdminPage() {
   const [uploadPhotographer, setUploadPhotographer] = useState("Church Media Unit");
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState("");
+  const [uploadPercent, setUploadPercent] = useState<number>(0);
   const [uploadMessage, setUploadMessage] = useState("");
   const [uploadError, setUploadError] = useState("");
 
@@ -103,63 +104,158 @@ export default function GalleryAdminPage() {
     }
   };
 
-  // Fast client-side image compression: shrinks heavy 8-15MB phone camera photos to ~250KB in milliseconds
+  // Fast client-side image compression: safely resizes heavy images in canvas before transmission
   const compressImageForWeb = async (file: File): Promise<File> => {
-    if (!file.type.startsWith("image/") || file.size < 400 * 1024) {
+    // If not a standard raster image or already small (< 500KB), return as-is
+    if (!file.type.startsWith("image/") || file.type.includes("svg") || file.size < 500 * 1024) {
       return file;
     }
 
     return new Promise((resolve) => {
-      const img = new window.Image();
-      const objectUrl = URL.createObjectURL(file);
-
-      img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        const canvas = document.createElement("canvas");
-        let { width, height } = img;
-
-        // Scale to maximum 1920px (full HD is optimal for web)
-        const maxDim = 1920;
-        if (width > height && width > maxDim) {
-          height = Math.round((height * maxDim) / width);
-          width = maxDim;
-        } else if (height > maxDim) {
-          width = Math.round((width * maxDim) / height);
-          height = maxDim;
+      let resolved = false;
+      const timer = setTimeout(() => {
+        if (!resolved) {
+          resolved = true;
+          resolve(file); // Safe fallback to original
         }
+      }, 2500);
 
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return resolve(file);
+      try {
+        const img = new window.Image();
+        const objectUrl = URL.createObjectURL(file);
 
-        ctx.drawImage(img, 0, 0, width, height);
+        img.onload = () => {
+          if (resolved) return;
+          URL.revokeObjectURL(objectUrl);
+          try {
+            const canvas = document.createElement("canvas");
+            let { width, height } = img;
 
-        canvas.toBlob(
-          (blob) => {
-            if (!blob) return resolve(file);
-            const cleanBase = file.name.replace(/\.[^/.]+$/, "");
-            const compressed = new File([blob], `${cleanBase}.jpg`, {
-              type: "image/jpeg",
-              lastModified: Date.now(),
-            });
-            resolve(compressed);
-          },
-          "image/jpeg",
-          0.82
-        );
-      };
+            // Maximum 2048px (full high-definition web resolution)
+            const maxDim = 2048;
+            if (width > height && width > maxDim) {
+              height = Math.round((height * maxDim) / width);
+              width = maxDim;
+            } else if (height > maxDim) {
+              width = Math.round((width * maxDim) / height);
+              height = maxDim;
+            }
 
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        resolve(file);
-      };
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) {
+              clearTimeout(timer);
+              resolved = true;
+              return resolve(file);
+            }
 
-      img.src = objectUrl;
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+              (blob) => {
+                clearTimeout(timer);
+                if (resolved) return;
+                resolved = true;
+                if (!blob || blob.size >= file.size) {
+                  return resolve(file);
+                }
+                const cleanBase = file.name.replace(/\.[^/.]+$/, "");
+                const compressed = new File([blob], `${cleanBase}.jpg`, {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(compressed);
+              },
+              "image/jpeg",
+              0.84
+            );
+          } catch {
+            clearTimeout(timer);
+            if (!resolved) {
+              resolved = true;
+              resolve(file);
+            }
+          }
+        };
+
+        img.onerror = () => {
+          clearTimeout(timer);
+          URL.revokeObjectURL(objectUrl);
+          if (!resolved) {
+            resolved = true;
+            resolve(file);
+          }
+        };
+
+        img.src = objectUrl;
+      } catch {
+        clearTimeout(timer);
+        if (!resolved) {
+          resolved = true;
+          resolve(file);
+        }
+      }
     });
   };
 
-  // Submit batch upload with compression and progressive per-photo uploading
+  // Direct high-speed upload to Cloudinary CDN with live progress tracking
+  const uploadSinglePhotoToCloudinary = (
+    file: File,
+    signData: { cloudName: string; apiKey: string; timestamp: number; signature: string; folder: string },
+    onProgress: (percent: number) => void
+  ): Promise<{ secure_url: string; public_id: string }> => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      const url = `https://api.cloudinary.com/v1_1/${signData.cloudName}/image/upload`;
+
+      xhr.upload.onprogress = (evt) => {
+        if (evt.lengthComputable) {
+          const percent = Math.round((evt.loaded / evt.total) * 100);
+          onProgress(percent);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            resolve(data);
+          } catch {
+            reject(new Error("Invalid response received from cloud storage"));
+          }
+        } else {
+          try {
+            const errRes = JSON.parse(xhr.responseText);
+            reject(new Error(errRes?.error?.message || `Cloud upload returned status ${xhr.status}`));
+          } catch {
+            reject(new Error(`Cloud upload failed with status ${xhr.status}`));
+          }
+        }
+      };
+
+      xhr.onerror = () => {
+        reject(new Error("Network connection interrupted during photo upload. Please check your data signal."));
+      };
+
+      xhr.ontimeout = () => {
+        reject(new Error("Upload timed out (took longer than 3 minutes)."));
+      };
+
+      const cFormData = new FormData();
+      cFormData.append("file", file);
+      cFormData.append("api_key", signData.apiKey);
+      cFormData.append("timestamp", signData.timestamp.toString());
+      cFormData.append("signature", signData.signature);
+      cFormData.append("folder", signData.folder);
+
+      xhr.open("POST", url, true);
+      xhr.timeout = 180000; // 3 minutes timeout
+      xhr.send(cFormData);
+    });
+  };
+
+  // Submit batch upload with direct cloud acceleration and fallback
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedFiles.length === 0) {
@@ -170,45 +266,124 @@ export default function GalleryAdminPage() {
     setIsUploading(true);
     setUploadError("");
     setUploadMessage("");
+    setUploadPercent(0);
 
     try {
+      // 1. Check if direct signed Cloudinary upload is available
+      let signData: {
+        direct: boolean;
+        cloudName?: string;
+        apiKey?: string;
+        timestamp?: number;
+        signature?: string;
+        folder?: string;
+      } | null = null;
+
+      try {
+        const signRes = await fetch("/api/admin/gallery/sign");
+        if (signRes.ok) {
+          signData = await signRes.json();
+        }
+      } catch (signErr) {
+        console.warn("Could not check signing endpoint, using server proxy fallback:", signErr);
+      }
+
       let successCount = 0;
 
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
-        setUploadProgress(
-          `Optimizing & uploading ${i + 1} of ${selectedFiles.length} (${file.name})...`
-        );
+        const fileLabel = `${i + 1} of ${selectedFiles.length} (${file.name})`;
+        setUploadProgress(`Optimizing photo ${fileLabel}...`);
+        setUploadPercent(10);
 
-        // 1. Shrink heavy mobile camera photo
+        // Pre-optimize image resolution if applicable
         const optimizedFile = await compressImageForWeb(file);
+        setUploadPercent(25);
 
-        // 2. Upload individually so it never exceeds Vercel's 4.5MB request limit
-        const formData = new FormData();
-        formData.append("file", optimizedFile);
-        formData.append("category", uploadCategory);
-        formData.append(
-          "title",
-          uploadTitle || file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ")
-        );
-        formData.append("caption", uploadCaption);
-        formData.append("photographer", uploadPhotographer);
+        let finalImageUrl = "";
 
-        const res = await fetch("/api/admin/gallery/upload", {
-          method: "POST",
-          body: formData,
-        });
+        if (
+          signData?.direct &&
+          signData.cloudName &&
+          signData.apiKey &&
+          signData.signature &&
+          signData.timestamp &&
+          signData.folder
+        ) {
+          // DIRECT TO CLOUDINARY: Bypasses Vercel's 4.5MB payload limit and 10-second timeout entirely!
+          setUploadProgress(`Uploading ${fileLabel} directly to Cloudinary CDN...`);
+          const cloudResult = await uploadSinglePhotoToCloudinary(
+            optimizedFile,
+            {
+              cloudName: signData.cloudName,
+              apiKey: signData.apiKey,
+              timestamp: signData.timestamp,
+              signature: signData.signature,
+              folder: signData.folder,
+            },
+            (pct) => {
+              // Map progress from 25% to 90%
+              const mapped = 25 + Math.round((pct * 65) / 100);
+              setUploadPercent(mapped);
+              setUploadProgress(`Uploading ${fileLabel}: ${pct}%`);
+            }
+          );
 
-        if (!res.ok) {
-          const errData = await res.json().catch(() => ({}));
-          throw new Error(errData.error || `Upload failed for ${file.name}`);
+          finalImageUrl = cloudResult.secure_url;
+          setUploadProgress(`Saving ${fileLabel} to sanctuary records...`);
+          setUploadPercent(95);
+
+          // Save record in church database
+          const title = uploadTitle || file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ");
+          const saveRes = await fetch("/api/admin/gallery", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              title,
+              caption: uploadCaption || "Moments of worship at First Baptist Church Jobele.",
+              category: uploadCategory,
+              imageUrl: finalImageUrl,
+              date: new Date().toISOString().split("T")[0],
+              photographer: uploadPhotographer,
+              isFeatured: images.length === 0 && successCount === 0,
+              order: 0,
+            }),
+          });
+
+          if (!saveRes.ok) {
+            const errData = await saveRes.json().catch(() => ({}));
+            throw new Error(errData.error || `Failed to record ${file.name} in database`);
+          }
+        } else {
+          // FALLBACK: Standard serverless route (useful in local dev without cloud keys)
+          setUploadProgress(`Uploading ${fileLabel} via server...`);
+          const formData = new FormData();
+          formData.append("file", optimizedFile);
+          formData.append("category", uploadCategory);
+          formData.append(
+            "title",
+            uploadTitle || file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ")
+          );
+          formData.append("caption", uploadCaption);
+          formData.append("photographer", uploadPhotographer);
+
+          const res = await fetch("/api/admin/gallery/upload", {
+            method: "POST",
+            body: formData,
+          });
+
+          if (!res.ok) {
+            const errData = await res.json().catch(() => ({}));
+            throw new Error(errData.error || `Upload failed for ${file.name} (Status: ${res.status})`);
+          }
         }
 
         successCount++;
+        setUploadPercent(100);
       }
 
       setUploadMessage(
-        `Success! ${successCount} photo(s) have been optimized, uploaded, and are now live on the church website.`
+        `Success! ${successCount} photograph(s) uploaded successfully and are now live on the church website.`
       );
       clearSelectedFiles();
       setUploadTitle("");
@@ -216,14 +391,15 @@ export default function GalleryAdminPage() {
       fetchImages();
       setActiveTab("manage");
     } catch (err: any) {
-      console.error("Upload error:", err);
+      console.error("Gallery upload error:", err);
       setUploadError(
         err.message ||
-          "Network error occurred during upload. Please check your internet connection."
+          "An error occurred while uploading. Please ensure your device has a stable internet connection and try again."
       );
     } finally {
       setIsUploading(false);
       setUploadProgress("");
+      setUploadPercent(0);
     }
   };
 
@@ -377,7 +553,7 @@ export default function GalleryAdminPage() {
                 ref={fileInputRef}
                 type="file"
                 multiple
-                accept="image/*"
+                accept="image/*,.heic,.heif,.HEIC,.HEIF"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -391,7 +567,7 @@ export default function GalleryAdminPage() {
                   Click to select or drag and drop photographs here
                 </p>
                 <p className="text-xs text-obsidian-500 mt-1">
-                  Supports JPEG, PNG, WEBP (Single or multi-file upload up to 20 images at once)
+                  Supports JPEG, PNG, WEBP, HEIC (Single or multi-file upload with instant cloud storage)
                 </p>
               </div>
 
@@ -493,6 +669,25 @@ export default function GalleryAdminPage() {
                 />
               </div>
             </div>
+
+            {/* Live Progress Bar when Uploading */}
+            {isUploading && (
+              <div className="p-4 rounded-2xl bg-burgundy-50 border border-burgundy-200 text-burgundy-900 space-y-2 animate-fade-in">
+                <div className="flex items-center justify-between text-xs font-semibold">
+                  <span className="flex items-center space-x-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-burgundy-700" />
+                    <span>{uploadProgress || "Uploading..."}</span>
+                  </span>
+                  <span className="font-mono text-burgundy-800 font-bold">{uploadPercent}%</span>
+                </div>
+                <div className="w-full bg-burgundy-200/70 rounded-full h-2.5 overflow-hidden">
+                  <div
+                    className="bg-gradient-to-r from-gold-500 to-burgundy-700 h-2.5 rounded-full transition-all duration-300 ease-out"
+                    style={{ width: `${uploadPercent}%` }}
+                  />
+                </div>
+              </div>
+            )}
 
             <div className="flex items-center space-x-3 pt-2">
               <button

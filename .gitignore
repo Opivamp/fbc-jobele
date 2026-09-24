@@ -30,3 +30,7 @@ Thumbs.db
 
 # TypeScript
 *.tsbuildinfo
+
+# Local uploads and test scripts
+public/uploads/
+test_*.js
